@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 
 @Entity()
-export default class Player {
+export class Player {
 	@PrimaryGeneratedColumn()
 	id = undefined;
 
@@ -12,10 +12,10 @@ export default class Player {
 	lastName = '';
 
 	getId() {
-		return 1;
+		return id;
 	}
 
 	getFullName() {
-		return `${this.firstName} ${this.lastName}`;
+		return `${firstName} ${lastName}`;
 	}
 }

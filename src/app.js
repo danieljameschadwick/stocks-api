@@ -1,4 +1,5 @@
 import 'reflect-metadata';
+import { createConnection } from 'typeorm';
 import express from 'express';
 import { graphqlHTTP } from 'express-graphql';
 import { buildSchema } from 'graphql';
@@ -27,7 +28,8 @@ var root = {
 
 app.get('/', (request, response) => {
 	response.send({
-		message: '',
+		healthCheck: true,
+		statusCode: 200
 	});
 });
 
@@ -40,10 +42,23 @@ app.get('/user/:id', (request, response) => {
 app.post('/user', (request, response) => {
 	const data = request.body;
 
+	createConnection()
+		.then((connection) => {
+			const player = new Player();
+			player.firstName = data.firstName;
+			player.lastName = data.lastName;
 
+			return connection
+				.getRepository(Player)
+				.save(player)
+				.then((player) => {
+					console.log('Player has been saved: ', player);
+				});
+		})
+		.catch((error) => console.log('Error: ', error));
 
 	response.send({
-		message: `User with :id of ${data.firstName} ${data.lastName}`,
+		message: `User with ${player.id} of ${data.firstName} ${data.lastName}`,
 	});
 });
 

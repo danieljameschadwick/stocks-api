@@ -4,9 +4,9 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "build": "babel src --out-dir dist && node dist/app.js",
-    "start": "npm run build && node dist/app.js",
-    "nodemon": "nodemon src/app.js",
+    "start": "npm-run-all --parallel watch:server watch:build",
+    "watch:build": "webpack --watch",
+    "watch:server": "nodemon \"./dist/main.js\" --watch \"./dist\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
@@ -14,12 +14,17 @@
   "dependencies": {
     "babel-core": "^7.0.0-bridge.0",
     "express": "^4.17.1",
+    "npm-run-all": "^4.1.5",
     "reflect-metadata": "^0.1.13",
     "typeorm": "^0.2.29"
   },
   "devDependencies": {
     "@babel/cli": "^7.12.10",
     "@babel/core": "^7.12.10",
-    "@babel/preset-env": "^7.12.11"
+    "@babel/preset-env": "^7.12.11",
+    "babel-loader": "^8.2.2",
+    "webpack": "^5.12.3",
+    "webpack-cli": "^4.3.1",
+    "webpack-node-externals": "^2.5.2"
   }
 }
