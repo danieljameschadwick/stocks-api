@@ -7,7 +7,8 @@
     "start": "npm-run-all --parallel watch:server watch:build",
     "watch:build": "webpack --config webpack.config.js --watch",
     "watch:server": "nodemon \"./dist/main.js\" --watch \"./dist\"",
-    "dev": "tsc && node src/main.js",
+    "dev": "tsc -w && nodemon src/main.js",
+    "watch": "nodemon --ext ts --exec 'tsc && node src/main.js'",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

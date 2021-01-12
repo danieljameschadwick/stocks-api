@@ -11,6 +11,9 @@ export class Player {
     @Column()
     lastName: string;
 
+    @Column()
+    price: number | null;
+
     getId(): ObjectID {
         return this.id;
     };
@@ -18,4 +21,8 @@ export class Player {
     getFullName(): string {
         return `${(this.firstName)} ${(this.lastName)}`;
     };
+
+    getPrice(): number | null {
+        return this.price;
+    }
 }
