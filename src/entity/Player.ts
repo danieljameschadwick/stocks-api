@@ -3,7 +3,7 @@ import { Entity, ObjectIdColumn, Column, ObjectID } from 'typeorm';
 @Entity()
 export class Player {
     @ObjectIdColumn()
-    id: ObjectID;
+    id?: ObjectID;
 
     @Column()
     firstName: string;
@@ -12,9 +12,15 @@ export class Player {
     lastName: string;
 
     @Column()
-    price: number | null;
+    price?: number;
 
-    getId(): ObjectID {
+    constructor(firstName: string, lastName: string, price?: number) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.price = price;
+    }
+
+    getId(): ObjectID | null {
         return this.id;
     };
 
