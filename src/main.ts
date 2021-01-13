@@ -1,19 +1,25 @@
 import 'reflect-metadata';
-import { createConnection, getManager } from 'typeorm';
-import express, { Request, Response } from 'express';
+import express, { json } from 'express';
+import { createConnection } from 'typeorm';
 import { graphqlHTTP } from 'express-graphql';
 import { buildSchema } from 'graphql';
 import { Player } from './entity/Player';
 import { createExpressServer } from 'routing-controllers';
+import { MainController } from './controller/MainController';
+import { PlayerController } from './controller/PlayerController';
 
 createConnection().then(() => {
     // const app = express();
     const app = createExpressServer({
-        controllers: [__dirname + '/controller/*.js'], // @TODO: doesn't feel right importing JS file in TS?
+        // controllers: [__dirname + '/controller/*.js'], // @TODO: doesn't feel right importing JS file in TS?
+        controllers: [
+            MainController,
+            PlayerController
+        ]
     });
     const port = 3000;
 
-    app.use(express.json());
+    app.use(json());
 
     const schema = buildSchema(`
         type Player {
@@ -31,13 +37,6 @@ createConnection().then(() => {
             return new Player('Daniel', 'Chadwick');
         },
     };
-
-    app.get('/', (request: Request, response: Response) => {
-        response.send({
-            healthCheck: true,
-            statusCode: 200
-        });
-    });
 
     app.use(
         '/graphql',
