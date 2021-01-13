@@ -2,14 +2,17 @@ import { json, Request, Response } from 'express';
 import { Controller, Get, Post, Put, Req, Res, UseBefore } from 'routing-controllers';
 import { getConnectionManager, Repository } from 'typeorm';
 import { Player } from '../entity/Player';
+import { Team } from '../entity/Team';
 
 @Controller('/player')
 @UseBefore(json())
 class PlayerController {
     private playerRepository: Repository<Player>;
+    private teamRepository: Repository<Team>;
 
     constructor() {
         this.playerRepository = getConnectionManager().get().getRepository(Player);
+        this.teamRepository = getConnectionManager().get().getRepository(Team);
     }
 
     @Get('/:id')
@@ -76,9 +79,16 @@ class PlayerController {
             });
         }
 
+        let team = null;
+
+        if (data.team !== undefined) {
+            team = await this.teamRepository.findOne(data.team);
+        }
+
         const playerModel = new Player(
             data.firstName,
-            data.lastName
+            data.lastName,
+            team
         );
 
         const updateResult = await this.playerRepository.update(id, playerModel);

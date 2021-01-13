@@ -16,9 +16,10 @@ export class Player {
     @ManyToOne(type => Team, team => team.players)
     team?: Team;
 
-    constructor(firstName: string, lastName: string) {
+    constructor(firstName: string, lastName: string, team?: Team) {
         this.firstName = firstName;
         this.lastName = lastName;
+        this.team = team;
     }
 
     getId(): ObjectID | null {
