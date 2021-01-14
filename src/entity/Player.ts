@@ -22,11 +22,7 @@ export class Player {
         this.team = team;
     }
 
-    getId(): ObjectID | null {
-        return this.id;
-    };
-
-    getFullName(): string {
+    get fullName(): string {
         return `${(this.firstName)} ${(this.lastName)}`;
     };
 }

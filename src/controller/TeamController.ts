@@ -4,42 +4,40 @@ import { getConnectionManager, Repository } from 'typeorm';
 import { Player } from '../entity/Player';
 import { Team } from '../entity/Team';
 
-@Controller('/player')
+@Controller('/team')
 @UseBefore(json())
-class PlayerController {
-    private playerRepository: Repository<Player>;
+class TeamController {
     private teamRepository: Repository<Team>;
 
     constructor() {
-        this.playerRepository = getConnectionManager().get().getRepository(Player);
         this.teamRepository = getConnectionManager().get().getRepository(Team);
     }
 
     @Get('/')
     async all(@Req() request: Request, @Res() response: Response) {
-        const players = await this.playerRepository.find();
+        const teams = await this.teamRepository.find();
 
         return response.send({
             message: {},
-            data: players
+            data: teams
         });
     }
 
     @Get('/:id')
     async get(@Req() request: Request, @Res() response: Response) {
         const id = request.params.id;
-        const player = await this.playerRepository.findOne(id);
+        const team = await this.teamRepository.findOne(id);
 
-        if (player === undefined) {
+        if (team === undefined) {
             return response.send({
-                message: `Player with :id ${id} could not be found.`,
+                message: `Team with :id ${id} could not be found.`,
                 data: {}
             });
         }
 
         return response.send({
-            message: `Player with name ${player.fullName} [${id}] was found.`,
-            data: player
+            message: `Team with name ${team.name} [${id}] was found.`,
+            data: team
         });
     }
 
@@ -54,23 +52,23 @@ class PlayerController {
             });
         }
 
-        const playerModel = new Player(
-            data.firstName,
-            data.lastName
+        const teamModel = new Team(
+            data.name,
+            data.abbreviation
         );
 
-        const player = await this.playerRepository.save(playerModel);
+        const team = await this.teamRepository.save(teamModel);
 
-        if (player === undefined) {
+        if (team === undefined) {
             return response.send({
-                message: `Player with name ${playerModel.fullName} [ - ] was not created.`,
-                data: player,
+                message: `Team with name ${teamModel.name} [ - ] was not created.`,
+                data: team,
             });
         }
 
         return response.send({
-            message: `Player with name ${player.fullName} [${player.id}] created.`,
-            data: player,
+            message: `Team with name ${team.name} [${team.id}] created.`,
+            data: team,
         });
     }
 
@@ -89,35 +87,29 @@ class PlayerController {
             });
         }
 
-        let team = null;
-
-        if (data.team !== undefined) {
-            team = await this.teamRepository.findOne(data.team);
-        }
-
-        const playerModel = new Player(
-            data.firstName,
-            data.lastName,
-            team
+        const teamModel = new Team(
+            data.name,
+            data.abbreviation,
+            data.players
         );
 
-        const updateResult = await this.playerRepository.update(id, playerModel);
+        const updateResult = await this.teamRepository.update(id, teamModel);
 
         if (updateResult.affected < 1) {
             return response.send({
-                message: `Player with name ${playerModel.fullName} [${id}] was not updated.`,
+                message: `Team with name ${teamModel.name} [${id}] was not updated.`,
                 data: {},
             });
         }
 
-        const player = await this.playerRepository.findOne(id);
+        const team = await this.teamRepository.findOne(id);
         return response.send({
-            message: `Player with ${player.id} of ${player.fullName} updated.`,
-            data: player,
+            message: `Team with ${team.id} of ${team.name} updated.`,
+            data: team,
         });
     }
 }
 
 export {
-    PlayerController
+    TeamController
 };

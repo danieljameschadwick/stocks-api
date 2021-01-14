@@ -7,6 +7,7 @@ import { Player } from './entity/Player';
 import { createExpressServer } from 'routing-controllers';
 import { MainController } from './controller/MainController';
 import { PlayerController } from './controller/PlayerController';
+import { TeamController } from './controller/TeamController';
 
 createConnection().then(() => {
     // const app = express();
@@ -14,7 +15,8 @@ createConnection().then(() => {
         // controllers: [__dirname + '/controller/*.js'], // @TODO: doesn't feel right importing JS file in TS?
         controllers: [
             MainController,
-            PlayerController
+            PlayerController,
+            TeamController
         ]
     });
     const port = 3000;

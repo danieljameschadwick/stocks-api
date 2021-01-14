@@ -16,16 +16,12 @@ export class Team {
     @OneToMany(type => Player, player => player.team)
     players: Player[];
 
-    constructor(name: string, abbreviation: string) {
+    constructor(name: string, abbreviation: string, players?: Array<Player>) {
         this.name = name;
         this.abbreviation = abbreviation;
+
+        if (players !== null) {
+            this.players = players;
+        }
     }
-
-    getId(): ObjectID | null {
-        return this.id;
-    };
-
-    getName(): string {
-        return this.name;
-    };
 }
