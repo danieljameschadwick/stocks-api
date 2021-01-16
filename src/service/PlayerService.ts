@@ -8,6 +8,7 @@ import { PlayerGetResponse as GetResponse } from '../dto/response/player/PlayerG
 import { PlayerCreateResponse as CreateResponse } from '../dto/response/player/PlayerCreateResponse';
 import { PlayerUpdateResponse as UpdateResponse } from '../dto/response/player/PlayerUpdateResponse';
 import { PlayerGetAllResponse } from '../dto/response/player/PlayerGetAllResponse';
+import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethodResponse';
 
 export class PlayerService {
     private playerRepository: Repository<Player>;
@@ -67,7 +68,7 @@ export class PlayerService {
     }
 
     async create(playerDTO: PlayerDTO): Promise<CreateResponse> {
-        let player = new Player(
+        const playerModel = new Player(
             playerDTO.firstName,
             playerDTO.lastName
         );
@@ -77,19 +78,21 @@ export class PlayerService {
             // this.teamService.get(playerDTO.team);
         }
 
+        let player = undefined;
+
         try {
-            player = await this.playerRepository.save(player);
+            player = await this.playerRepository.save(playerModel);
         } catch (error) {
             if (error.code === ORM.DUPLICATED_ENTRY) {
                 return new CreateResponse(
-                    'Duplicated user',
+                    `Player ${playerModel.fullName} already exists`,
                     null,
                     HttpCodes.HTTP_STATUS_FOUND
                 );
             }
 
             return new CreateResponse(
-                'Unknown error whilst saving.',
+                `Unknown error whilst saving Player ${playerModel.fullName}.`,
                 null,
                 HttpCodes.HTTP_STATUS_BAD_REQUEST
             );
@@ -108,7 +111,25 @@ export class PlayerService {
             playerDTO.lastName
         );
 
-        const updateResult = await this.playerRepository.update(id, playerModel);
+        let updateResult = undefined;
+
+        try {
+            updateResult = await this.playerRepository.update(id, playerModel);
+        } catch (error) {
+            if (error.code === ORM.DUPLICATED_ENTRY) {
+                return new CreateResponse(
+                    `Player ${playerModel.fullName} already exists. Player [${id}] wasn't updated.`,
+                    null,
+                    HttpCodes.HTTP_STATUS_FOUND
+                );
+            }
+
+            return new CreateResponse(
+                `Unknown error whilst saving Player ${playerModel.fullName}.`,
+                null,
+                HttpCodes.HTTP_STATUS_FOUND
+            );
+        }
 
         if (updateResult.affected < 1) {
             return new UpdateResponse(
@@ -128,7 +149,7 @@ export class PlayerService {
         );
     }
 
-    disable() {
-
+    async delete(id: number): Promise<UnimplementedMethodResponse> {
+        return new UnimplementedMethodResponse();
     }
 }

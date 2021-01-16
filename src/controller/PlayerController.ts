@@ -1,8 +1,5 @@
 import { json, Request, Response } from 'express';
-import { Controller, Get, Post, Put, Req, Res, UseBefore } from 'routing-controllers';
-import { getManager, Repository } from 'typeorm';
-import { Player } from '../entity/Player';
-import { TeamRepository } from '../repository/TeamRepository';
+import { Controller, Delete, Get, Post, Put, Req, Res, UseBefore } from 'routing-controllers';
 import { PlayerService } from '../service/PlayerService';
 import { PlayerDTO } from '../dto/PlayerDTO';
 import { TeamService } from '../service/TeamService';
@@ -13,15 +10,11 @@ import { constants as HttpCodes } from 'http2';
 @UseBefore(json())
 class PlayerController {
     private playerService: PlayerService;
-    private playerRepository: Repository<Player>;
     private teamService: TeamService;
-    private teamRepository: TeamRepository;
 
     constructor() {
         this.playerService = new PlayerService();
         this.teamService = new TeamService();
-        this.playerRepository = getManager().getRepository(Player);
-        this.teamRepository = getManager().getCustomRepository(TeamRepository);
     }
 
     @Get('/')
@@ -84,6 +77,13 @@ class PlayerController {
                 team
             )
         );
+    }
+
+    @Delete('/:id')
+    async delete(@Req() request, @Res() response) {
+        const id = parseInt(request.params.id);
+
+        return await this.playerService.delete(id);
     }
 }
 

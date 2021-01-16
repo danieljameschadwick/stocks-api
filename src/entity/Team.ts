@@ -8,7 +8,8 @@ import {
 import { Player } from './Player';
 
 @Entity()
-@Unique(['name', 'abbreviation'])
+@Unique(['name'])
+@Unique(['abbreviation'])
 export class Team extends BaseEntity {
     @PrimaryGeneratedColumn()
     id?: number;

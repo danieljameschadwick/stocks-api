@@ -1,91 +1,57 @@
 import { json, Request, Response } from 'express';
-import { Controller, Get, Post, Put, Req, Res, UseBefore } from 'routing-controllers';
-import { getManager, Repository } from 'typeorm';
-import { Team } from '../entity/Team';
-import { ORM } from '../enum/Error';
+import { Controller, Delete, Get, Post, Put, Req, Res, UseBefore } from 'routing-controllers';
+import { PlayerService } from '../service/PlayerService';
+import { TeamService } from '../service/TeamService';
+import { constants as HttpCodes } from 'http2';
+import { TeamGetResponse } from '../dto/response/team/TeamGetResponse';
+import { TeamDTO } from '../dto/TeamDTO';
 
 @Controller('/team')
 @UseBefore(json())
 class TeamController {
-    private teamRepository: Repository<Team>;
+    private playerService: PlayerService;
+    private teamService: TeamService;
 
     constructor() {
-        this.teamRepository = getManager().getRepository(Team);
+        this.playerService = new PlayerService();
+        this.teamService = new TeamService();
     }
 
     @Get('/')
     async all(@Req() request: Request, @Res() response: Response) {
-        const teams = await this.teamRepository.find();
-
-        return response.send({
-            message: {},
-            data: teams
-        });
+        return await this.teamService.getAll();
     }
 
     @Get('/:id')
     async get(@Req() request: Request, @Res() response: Response) {
-        const id = request.params.id;
-        const team = await this.teamRepository.findOne(id, { relations: ['players'] });
+        const id = parseInt(request.params.id);
 
-        if (team === undefined) {
-            return response.send({
-                message: `Team with :id ${id} could not be found.`,
-                data: {}
-            });
+        if (id === undefined) {
+            return new TeamGetResponse(
+                'Couldn\'t find the ID in the request.',
+                {},
+                HttpCodes.HTTP_STATUS_BAD_REQUEST
+            );
         }
 
-        return response.send({
-            message: `Team with name ${team.name} [${id}] was found.`,
-            data: team
-        });
+        return await this.teamService.get(id);
     }
 
     @Post('/')
     async create(@Req() request: Request, @Res() response: Response) {
         const data = request.body;
 
-        if (data === undefined) {
-            return response.send({
-                message: `No content sent.`,
-                data: {},
-            });
-        }
-
-        const teamModel = new Team(
-            data.name,
-            data.abbreviation
+        return await this.teamService.create(
+            new TeamDTO(
+                data.name,
+                data.abbreviation
+            )
         );
-
-        let team = undefined;
-
-        try {
-            team = await this.teamRepository.save(teamModel);
-        } catch (error) {
-            if (error.code === ORM.DUPLICATED_ENTRY) {
-                return response.send({
-                    message: `Team with name ${teamModel.name} [ - ] already exists.`,
-                    data: {},
-                });
-            }
-        }
-
-        if (team === undefined) {
-            return response.send({
-                message: `Team with name ${teamModel.name} [ - ] was not created.`,
-                data: team,
-            });
-        }
-
-        return response.send({
-            message: `Team with name ${team.name} [${team.id}] created.`,
-            data: team,
-        });
     }
 
     @Put('/:id')
     async update(@Req() request: Request, @Res() response: Response) {
-        const id = request.params.id;
+        const id = parseInt(request.params.id);
         const data = request.body;
 
         if (
@@ -98,27 +64,20 @@ class TeamController {
             });
         }
 
-        if (await this.teamRepository.findOne(id) === undefined) {
-            return response.send({
-                message: `Team with id [${id}] could not be found.`,
-                data: {},
-            });
-        }
+        return await this.teamService.update(
+            id,
+            new TeamDTO(
+                data.name,
+                data.abbreviation
+            )
+        );
+    }
 
-        const updateResult = await this.teamRepository.update(id, { name: data.name, abbreviation: data.abbreviation });
+    @Delete('/:id')
+    async delete(@Req() request, @Res() response) {
+        const id = parseInt(request.params.id);
 
-        if (updateResult.affected < 1) {
-            return response.send({
-                message: `Team with name ${data.name} [${id}] was not updated.`,
-                data: {},
-            });
-        }
-
-        const team = await this.teamRepository.findOne(id);
-        return response.send({
-            message: `Team with name ${team.name} [${team.id}] updated.`,
-            data: team,
-        });
+        return await this.teamService.delete(id);
     }
 }
 
