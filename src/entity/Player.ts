@@ -3,13 +3,13 @@ import {
     Column,
     Unique,
     ManyToOne,
-    PrimaryGeneratedColumn,
+    PrimaryGeneratedColumn, BaseEntity,
 } from 'typeorm';
 import { Team } from './Team';
 
 @Entity()
 @Unique(['firstName', 'lastName'])
-export class Player {
+export class Player extends BaseEntity {
     @PrimaryGeneratedColumn()
     id?: number;
 
@@ -23,6 +23,8 @@ export class Player {
     team?: Team;
 
     constructor(firstName: string, lastName: string, team?: Team) {
+        super();
+
         this.firstName = firstName;
         this.lastName = lastName;
         this.team = team;
