@@ -1,11 +1,17 @@
-import { Entity, ObjectIdColumn, Column, ObjectID, Unique, OneToMany } from 'typeorm';
+import {
+    Entity,
+    Column,
+    Unique,
+    OneToMany,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Player } from './Player';
 
 @Entity()
 @Unique(['name', 'abbreviation'])
 export class Team {
-    @ObjectIdColumn()
-    id?: ObjectID;
+    @PrimaryGeneratedColumn()
+    id?: number;
 
     @Column()
     name: string;
@@ -13,15 +19,15 @@ export class Team {
     @Column()
     abbreviation: string;
 
-    @OneToMany(type => Player, player => player.team)
+    @OneToMany(() => Player, player => player.team)
     players: Player[];
 
-    constructor(name: string, abbreviation: string, players?: Array<Player>) {
+    constructor(name: string, abbreviation: string, players?: Player[]) {
         this.name = name;
         this.abbreviation = abbreviation;
 
-        if (players !== null) {
-            this.players = players;
+        if (players) {
+            // this.players = players;
         }
     }
 }

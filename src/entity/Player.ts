@@ -1,11 +1,17 @@
-import { Entity, ObjectIdColumn, Column, ObjectID, Unique, ManyToOne } from 'typeorm';
+import {
+    Entity,
+    Column,
+    Unique,
+    ManyToOne,
+    PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Team } from './Team';
 
 @Entity()
 @Unique(['firstName', 'lastName'])
 export class Player {
-    @ObjectIdColumn()
-    id?: ObjectID;
+    @PrimaryGeneratedColumn()
+    id?: number;
 
     @Column()
     firstName: string;
@@ -13,7 +19,7 @@ export class Player {
     @Column()
     lastName: string;
 
-    @ManyToOne(type => Team, team => team.players)
+    @ManyToOne(() => Team, team => team.players)
     team?: Team;
 
     constructor(firstName: string, lastName: string, team?: Team) {

@@ -1,8 +1,8 @@
 import { json, Request, Response } from 'express';
 import { Controller, Get, Post, Put, Req, Res, UseBefore } from 'routing-controllers';
-import { getConnectionManager, Repository } from 'typeorm';
-import { Player } from '../entity/Player';
+import { getManager, Repository } from 'typeorm';
 import { Team } from '../entity/Team';
+import { ORM } from '../enum/Error';
 
 @Controller('/team')
 @UseBefore(json())
@@ -10,7 +10,7 @@ class TeamController {
     private teamRepository: Repository<Team>;
 
     constructor() {
-        this.teamRepository = getConnectionManager().get().getRepository(Team);
+        this.teamRepository = getManager().getRepository(Team);
     }
 
     @Get('/')
@@ -26,7 +26,7 @@ class TeamController {
     @Get('/:id')
     async get(@Req() request: Request, @Res() response: Response) {
         const id = request.params.id;
-        const team = await this.teamRepository.findOne(id);
+        const team = await this.teamRepository.findOne(id, { relations: ['players'] });
 
         if (team === undefined) {
             return response.send({
@@ -57,7 +57,18 @@ class TeamController {
             data.abbreviation
         );
 
-        const team = await this.teamRepository.save(teamModel);
+        let team = undefined;
+
+        try {
+            team = await this.teamRepository.save(teamModel);
+        } catch (error) {
+            if (error.code === ORM.DUPLICATED_ENTRY) {
+                return response.send({
+                    message: `Team with name ${teamModel.name} [ - ] already exists.`,
+                    data: {},
+                });
+            }
+        }
 
         if (team === undefined) {
             return response.send({
@@ -87,24 +98,25 @@ class TeamController {
             });
         }
 
-        const teamModel = new Team(
-            data.name,
-            data.abbreviation,
-            data.players
-        );
+        if (await this.teamRepository.findOne(id) === undefined) {
+            return response.send({
+                message: `Team with id [${id}] could not be found.`,
+                data: {},
+            });
+        }
 
-        const updateResult = await this.teamRepository.update(id, teamModel);
+        const updateResult = await this.teamRepository.update(id, { name: data.name, abbreviation: data.abbreviation });
 
         if (updateResult.affected < 1) {
             return response.send({
-                message: `Team with name ${teamModel.name} [${id}] was not updated.`,
+                message: `Team with name ${data.name} [${id}] was not updated.`,
                 data: {},
             });
         }
 
         const team = await this.teamRepository.findOne(id);
         return response.send({
-            message: `Team with ${team.id} of ${team.name} updated.`,
+            message: `Team with name ${team.name} [${team.id}] updated.`,
             data: team,
         });
     }

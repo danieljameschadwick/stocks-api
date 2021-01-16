@@ -1,12 +1,13 @@
 {
 	"name": "default",
-	"type": "mongodb",
+	"type": "mysql",
 	"host": "localhost",
-	"port": 27017,
-	"username": "",
+	"port": 3306,
+	"username": "root",
 	"password": "",
-	"database": "stocks",
+	"database": "stocks_cache",
 	"synchronize": true,
+	"autoSchemaSync": true,
 	"entities": [
 		"src/entity/*.js"
 	],
