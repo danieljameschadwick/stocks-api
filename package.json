@@ -5,7 +5,7 @@
 	"main": "./src/Main.ts",
 	"scripts": {
 		"start": "npm-run-all --parallel watch:server watch:build",
-		"watch:build": "webpack --config webpack.config.js --watch",
+		"watch:build": "webpack --config webpack.config.ts --watch",
 		"watch:server": "nodemon \"./dist/Main.js\" --watch \"./dist\"",
 		"dev": "tsc -w && nodemon src/Main.js",
 		"watch": "nodemon --ext ts --exec 'tsc && node src/main.js'",
