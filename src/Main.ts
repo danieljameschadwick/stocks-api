@@ -8,6 +8,7 @@ import { createExpressServer } from 'routing-controllers';
 import { MainController } from './controller/MainController';
 import { PlayerController } from './controller/PlayerController';
 import { TeamController } from './controller/TeamController';
+import { StockController } from './controller/StockController';
 
 createConnection().then(() => {
     // const app = express();
@@ -16,7 +17,8 @@ createConnection().then(() => {
         controllers: [
             MainController,
             PlayerController,
-            TeamController
+            TeamController,
+            StockController
         ]
     });
     const port = 3000;

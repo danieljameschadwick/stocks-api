@@ -1,31 +1,25 @@
 import { json, Request, Response } from 'express';
 import { Controller, Delete, Get, Post, Put, Req, Res, UseBefore } from 'routing-controllers';
-import { PlayerService } from '../service/PlayerService';
-import { PlayerDTO } from '../dto/PlayerDTO';
-import { TeamService } from '../service/TeamService';
-import { PlayerGetResponse } from '../dto/response/player/PlayerGetResponse';
 import { constants as HttpCodes } from 'http2';
-import { Stock } from '../entity/Stock';
 import { StockService } from '../service/StockService';
+import { StockGetResponse } from '../dto/response/stock/StockGetResponse';
+import { StockDTO } from '../dto/StockDTO';
+import { PlayerService } from '../service/PlayerService';
 
-@Controller('/player')
+@Controller('/stock')
 @UseBefore(json())
-class PlayerController {
-    private playerService: PlayerService;
-    private teamService: TeamService;
+class StockController {
     private stockService: StockService;
+    private playerService: PlayerService;
 
     constructor() {
-        this.playerService = new PlayerService();
-        this.teamService = new TeamService();
         this.stockService = new StockService();
+        this.playerService = new PlayerService();
     }
 
     @Get('/')
     async all(@Req() request: Request, @Res() response: Response) {
-        const ids = request.body.ids;
-
-        return await this.playerService.getAll(ids);
+        return await this.stockService.getAll();
     }
 
     @Get('/:id')
@@ -33,24 +27,24 @@ class PlayerController {
         const id = parseInt(request.params.id);
 
         if (id === undefined) {
-            return new PlayerGetResponse(
+            return new StockGetResponse(
                 'Couldn\'t find the ID in the request.',
                 {},
                 HttpCodes.HTTP_STATUS_BAD_REQUEST
             );
         }
 
-        return await this.playerService.get(id);
+        return await this.stockService.get(id);
     }
 
     @Post('/')
     async create(@Req() request: Request, @Res() response: Response) {
         const data = request.body;
 
-        return await this.playerService.create(
-            new PlayerDTO(
-                data.firstName,
-                data.lastName
+        return await this.stockService.create(
+            new StockDTO(
+                data.abbreviation,
+                data.player
             )
         );
     }
@@ -59,8 +53,7 @@ class PlayerController {
     async update(@Req() request: Request, @Res() response: Response) {
         const id = parseInt(request.params.id);
         const data = request.body;
-        let team = null;
-        let stock = null;
+        let player = null;
 
         if (
             data === undefined
@@ -72,21 +65,15 @@ class PlayerController {
             });
         }
 
-        if (data.team !== null) {
-            team = (await this.teamService.get(data.team.id)).data;
+        if (data.player !== null) {
+            player = (await this.playerService.get(data.player.id)).data;
         }
 
-        if (data.stock !== null) {
-            stock = (await this.stockService.get(data.stock.id)).data;
-        }
-
-        return await this.playerService.update(
+        return await this.stockService.update(
             id,
-            new PlayerDTO(
-                data.firstName,
-                data.lastName,
-                team,
-                stock
+            new StockDTO(
+                data.abbreviation,
+                player
             )
         );
     }
@@ -95,10 +82,10 @@ class PlayerController {
     async delete(@Req() request, @Res() response) {
         const id = parseInt(request.params.id);
 
-        return await this.playerService.delete(id);
+        return await this.stockService.delete(id);
     }
 }
 
 export {
-    PlayerController
+    StockController
 };

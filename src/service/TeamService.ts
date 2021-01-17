@@ -49,6 +49,14 @@ export class TeamService {
             );
         }
 
+        if (team === undefined) {
+            return new GetResponse(
+                `Team [${id}] could not be found.`,
+                null,
+                HttpCodes.HTTP_STATUS_NOT_FOUND
+            );
+        }
+
         return new GetResponse(
             `Team ${team.name} [${team.id}] found.`,
             team,
@@ -89,7 +97,17 @@ export class TeamService {
         );
     }
 
-    async update(id: number, teamDTO: TeamDTO): Promise<UpdateResponse> {
+    async update(id: number, teamDTO: TeamDTO, options?: object): Promise<UpdateResponse> {
+        let team = (await this.get(id)).data;
+
+        if (team === undefined) {
+            return new UpdateResponse(
+                `Unknown Team [${id}].`,
+                null,
+                HttpCodes.HTTP_STATUS_NOT_FOUND
+            );
+        }
+
         const teamModel = new Team(
             teamDTO.name,
             teamDTO.abbreviation
@@ -123,8 +141,7 @@ export class TeamService {
             );
         }
 
-        const getResponse = await this.get(id);
-        const team = getResponse.data;
+        team = (await this.get(id)).data;
 
         return new UpdateResponse(
             `Team ${team.name} [${team.id}] updated.`,

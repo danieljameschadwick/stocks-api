@@ -20,7 +20,9 @@ export class Team extends BaseEntity {
     @Column()
     abbreviation: string;
 
-    @OneToMany(() => Player, player => player.team)
+    @OneToMany(() => Player, player => player.team, {
+        cascade: false
+    })
     players: Player[];
 
     constructor(name: string, abbreviation: string, players?: Player[]) {

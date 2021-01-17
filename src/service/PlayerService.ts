@@ -1,4 +1,4 @@
-import { getManager, Repository } from 'typeorm';
+import { getManager, In, Repository } from 'typeorm';
 import { Player } from '../entity/Player';
 import { PlayerDTO } from '../dto/PlayerDTO';
 import { ORM } from '../enum/Error';
@@ -19,11 +19,21 @@ export class PlayerService {
         this.teamRepository = getManager().getRepository(Team);
     }
 
-    async getAll(): Promise<PlayerGetAllResponse> {
+    async getAll(ids?: number[]): Promise<PlayerGetAllResponse> {
         let players = [];
+        let options = {};
+
+        if (
+            ids !== undefined
+            && ids.length > 0
+        ) {
+            options = {
+                'id': In(ids),
+            };
+        }
 
         try {
-            players = await this.playerRepository.find();
+            players = await this.playerRepository.find(options);
         } catch (error) {
             return new PlayerGetAllResponse(
                 'Something went wrong when talking to the ORM.',
@@ -43,10 +53,12 @@ export class PlayerService {
         let player = undefined;
 
         try {
-            player = await this.playerRepository.findOne(id);
+            player = await this.playerRepository.findOne(id, {
+                relations: ['team', 'stock']
+            });
         } catch (error) {
             return new GetResponse(
-                'Unknown error whilst saving.',
+                `Error finding Player [${id}].`,
                 null,
                 HttpCodes.HTTP_STATUS_BAD_REQUEST
             );
@@ -106,26 +118,33 @@ export class PlayerService {
     }
 
     async update(id: number, playerDTO: PlayerDTO): Promise<UpdateResponse> {
-        const playerModel = new Player(
-            playerDTO.firstName,
-            playerDTO.lastName
-        );
-
         let updateResult = undefined;
+        let getResult = await this.get(id);
+        let player = getResult.data;
+
+        if (getResult.code !== HttpCodes.HTTP_STATUS_OK) {
+            return new UpdateResponse(
+                `Could not find Player ${id}.`,
+                getResult,
+                HttpCodes.HTTP_STATUS_FOUND
+            );
+        }
+
+        player.updateFromDTO(playerDTO);
 
         try {
-            updateResult = await this.playerRepository.update(id, playerModel);
+            updateResult = await this.playerRepository.update(id, player);
         } catch (error) {
             if (error.code === ORM.DUPLICATED_ENTRY) {
-                return new CreateResponse(
-                    `Player ${playerModel.fullName} already exists. Player [${id}] wasn't updated.`,
+                return new UpdateResponse(
+                    `Player ${player.fullName} already exists. Player [${id}] wasn't updated.`,
                     null,
                     HttpCodes.HTTP_STATUS_FOUND
                 );
             }
 
-            return new CreateResponse(
-                `Unknown error whilst saving Player ${playerModel.fullName}.`,
+            return new UpdateResponse(
+                `Unknown error whilst saving Player ${player.fullName}.`,
                 null,
                 HttpCodes.HTTP_STATUS_FOUND
             );
@@ -133,18 +152,18 @@ export class PlayerService {
 
         if (updateResult.affected < 1) {
             return new UpdateResponse(
-                `Player with name ${playerModel.fullName} [${id}] was not updated.`,
+                `Player with name ${player.fullName} [${id}] was not updated.`,
                 null,
                 HttpCodes.HTTP_STATUS_BAD_REQUEST
             );
         }
 
         const getResponse = await this.get(id);
-        const player = getResponse.data;
+        player = getResponse.data;
 
         return new UpdateResponse(
             `Player with ${player.id} of ${player.fullName} updated.`,
-            null,
+            player,
             HttpCodes.HTTP_STATUS_BAD_REQUEST
         );
     }
