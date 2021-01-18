@@ -73,7 +73,8 @@ class StockController {
             id,
             new StockDTO(
                 data.abbreviation,
-                player
+                player,
+                data.price
             )
         );
     }

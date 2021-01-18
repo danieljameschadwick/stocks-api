@@ -23,12 +23,13 @@ export class Player extends BaseEntity {
     @Column()
     lastName: string;
 
-    @ManyToOne(() => Team, team => team.players)
-    @JoinColumn({ name: 'teamId'})
+    @ManyToOne(() => Team, team => team.players, { nullable: true })
+    @JoinColumn({ name: 'teamId' })
     team?: Team;
 
     @OneToOne(() => Stock, stock => stock.player, {
-        cascade: true
+        cascade: true,
+        nullable: true,
     })
     @JoinColumn({ name: 'stockId'})
     stock?: Stock;

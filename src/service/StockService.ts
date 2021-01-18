@@ -1,4 +1,4 @@
-import { getManager, Repository } from 'typeorm';
+import { getConnection, getManager, Repository } from 'typeorm';
 import { constants as HttpCodes } from 'http2';
 import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethodResponse';
 import { Stock } from '../entity/Stock';
@@ -8,6 +8,7 @@ import { StockCreateResponse as CreateResponse } from '../dto/response/stock/Sto
 import { StockUpdateResponse as UpdateResponse } from '../dto/response/stock/StockUpdateResponse';
 import { StockDTO } from '../dto/StockDTO';
 import { ORM } from '../enum/Error';
+import { StockHistory } from '../entity/StockHistory';
 
 export class StockService {
     private stockRepository: Repository<Stock>;
@@ -40,7 +41,13 @@ export class StockService {
         let stock = undefined;
 
         try {
-            stock = await this.stockRepository.findOne(id, { relations: ['player'] });
+            stock = await this.stockRepository.createQueryBuilder('stock')
+                .innerJoinAndSelect('stock.player', 'player')
+                .leftJoinAndSelect('stock.stockHistory', 'stockHistory')
+                .orderBy({
+                    'stockHistory.dateTime': 'DESC',
+                })
+                .getOne();
         } catch (error) {
             return new GetResponse(
                 `Unknown whilst finding Stock [${id}].`,
@@ -105,16 +112,30 @@ export class StockService {
 
         if (getResult.code !== HttpCodes.HTTP_STATUS_OK) {
             return new UpdateResponse(
-                `Could not find Stock ${id}.`,
+                `Could not find Stock [${id}].`,
                 getResult,
                 HttpCodes.HTTP_STATUS_FOUND
             );
         }
 
-        stock.updateFromDTO(stockDTO);
-
         try {
-            updateResult = await this.stockRepository.update(id, stock);
+            updateResult = await getConnection().transaction(async (transactionalEntityManager) => {
+                const stockPrice = stock.price;
+                const lastUpdated = stock.updatedDate;
+
+                stock.updateFromDTO(stockDTO);
+
+                if (
+                    stockDTO.price !== null
+                    && stockPrice !== stock.price
+                ) {
+                    await transactionalEntityManager.save(
+                        new StockHistory(stock, stockPrice, lastUpdated)
+                    );
+                }
+
+                return await transactionalEntityManager.update(Stock, id, stock);
+            });
         } catch (error) {
             if (error.code === ORM.DUPLICATED_ENTRY) {
                 return new UpdateResponse(
@@ -123,6 +144,8 @@ export class StockService {
                     HttpCodes.HTTP_STATUS_FOUND
                 );
             }
+
+            console.log(error);
 
             return new UpdateResponse(
                 `Unknown error whilst saving Stock ${stock.abbreviation} [${stock.id}].`,
