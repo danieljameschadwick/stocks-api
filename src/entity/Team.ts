@@ -6,11 +6,14 @@ import {
     PrimaryGeneratedColumn, BaseEntity,
 } from 'typeorm';
 import { Player } from './Player';
+import { Field, ID, ObjectType } from 'type-graphql';
 
+@ObjectType()
 @Entity()
 @Unique(['name'])
 @Unique(['abbreviation'])
 export class Team extends BaseEntity {
+    @Field(type => ID)
     @PrimaryGeneratedColumn()
     id?: number;
 

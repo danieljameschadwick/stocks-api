@@ -1,7 +1,8 @@
-import { Request, Response } from 'express';
-import { Controller, Get, Post, Req, Res } from 'routing-controllers';
+import { json, Request, Response } from 'express';
+import { Controller, Get, Post, Req, Res, UseBefore } from 'routing-controllers';
 
 @Controller()
+@UseBefore(json())
 class MainController {
     @Get('/')
     get(@Req() request: Request, @Res() response: Response) {

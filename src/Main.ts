@@ -1,19 +1,17 @@
 import 'reflect-metadata';
-import express, { json } from 'express';
+import { json } from 'express';
 import { createConnection } from 'typeorm';
 import { graphqlHTTP } from 'express-graphql';
-import { buildSchema } from 'graphql';
-import { Player } from './entity/Player';
 import { createExpressServer } from 'routing-controllers';
 import { MainController } from './controller/MainController';
 import { PlayerController } from './controller/PlayerController';
 import { TeamController } from './controller/TeamController';
 import { StockController } from './controller/StockController';
+import { StockResolver } from './resolver/StockResolver';
+import { buildSchema } from 'type-graphql';
 
-createConnection().then(() => {
-    // const app = express();
+createConnection().then(async () => {
     const app = createExpressServer({
-        // controllers: [__dirname + '/controller/*.js'], // @TODO: doesn't feel right importing JS file in TS?
         controllers: [
             MainController,
             PlayerController,
@@ -25,29 +23,16 @@ createConnection().then(() => {
 
     app.use(json());
 
-    const schema = buildSchema(`
-        type Player {
-            id: Int
-            fullName: String
-        }
-    
-        type Query {
-            player(id: Int): Player
-        }
-    `);
-
-    const root = {
-        player: ({ id }) => {
-            return new Player('Daniel', 'Chadwick');
-        },
-    };
+    const schema = await buildSchema({
+        resolvers: [StockResolver]
+    });
 
     app.use(
         '/graphql',
         graphqlHTTP({
             schema: schema,
-            rootValue: root,
-        })
+            graphiql: true
+        }),
     );
 
     app.listen(port, () => {

@@ -5,9 +5,12 @@ import {
 } from 'typeorm';
 import { Stock } from './Stock';
 import { StockHistoryDTO } from '../dto/StockHistoryDTO';
+import { Field, ID, ObjectType } from 'type-graphql';
 
+@ObjectType()
 @Entity()
 export class StockHistory extends BaseEntity {
+    @Field(type => ID)
     @PrimaryGeneratedColumn()
     id?: number;
 
@@ -17,9 +20,11 @@ export class StockHistory extends BaseEntity {
     @JoinColumn({ name: 'stockId'})
     stock: Stock;
 
+    @Field()
     @Column()
     price: number;
 
+    @Field()
     @Column()
     dateTime: Date;
 

@@ -10,19 +10,25 @@ import {
 import { Team } from './Team';
 import { Stock } from './Stock';
 import { PlayerDTO } from '../dto/PlayerDTO';
+import { Field, ID, ObjectType } from 'type-graphql';
 
+@ObjectType()
 @Entity()
 @Unique(['firstName', 'lastName'])
 export class Player extends BaseEntity {
+    @Field(type => ID)
     @PrimaryGeneratedColumn()
     id?: number;
 
+    @Field()
     @Column()
     firstName: string;
 
+    @Field()
     @Column()
     lastName: string;
 
+    @Field(type => Team)
     @ManyToOne(() => Team, team => team.players, { nullable: true })
     @JoinColumn({ name: 'teamId' })
     team?: Team;

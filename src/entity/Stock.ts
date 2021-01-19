@@ -6,26 +6,33 @@ import {
 import { Player } from './Player';
 import { StockDTO } from '../dto/StockDTO';
 import { StockHistory } from './StockHistory';
+import { Field, ID, ObjectType } from 'type-graphql';
 
+@ObjectType()
 @Entity()
 export class Stock extends BaseEntity {
+    @Field(type => ID)
     @PrimaryGeneratedColumn()
     id?: number;
 
+    @Field()
     @Column()
     abbreviation: string;
 
+    @Field(type => Player)
     @OneToOne(() => Player, player => player.stock, {
         cascade: false
     })
     @JoinColumn({ name: 'playerId'})
     player: Player;
 
+    @Field(type => [StockHistory])
     @OneToMany(() => StockHistory, stockHistory => stockHistory.stock, {
         cascade: false
     })
     stockHistory: StockHistory[];
 
+    @Field({ nullable: true })
     @Column({
         nullable: true
     })
