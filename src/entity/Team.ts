@@ -17,12 +17,15 @@ export class Team extends BaseEntity {
     @PrimaryGeneratedColumn()
     id?: number;
 
+    @Field()
     @Column()
     name: string;
 
+    @Field()
     @Column()
     abbreviation: string;
 
+    @Field(type => [Player])
     @OneToMany(() => Player, player => player.team, {
         cascade: false
     })

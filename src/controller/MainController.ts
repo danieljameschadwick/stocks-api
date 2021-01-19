@@ -1,5 +1,5 @@
 import { json, Request, Response } from 'express';
-import { Controller, Get, Post, Req, Res, UseBefore } from 'routing-controllers';
+import { Controller, Get, Req, Res, UseBefore } from 'routing-controllers';
 
 @Controller()
 @UseBefore(json())

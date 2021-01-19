@@ -14,6 +14,7 @@ export class StockHistory extends BaseEntity {
     @PrimaryGeneratedColumn()
     id?: number;
 
+    @Field(type => Stock)
     @ManyToOne(() => Stock, stock => stock.stockHistory, {
         cascade: false
     })

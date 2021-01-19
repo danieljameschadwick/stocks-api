@@ -38,6 +38,7 @@ export class Stock extends BaseEntity {
     })
     price?: number;
 
+    @Field()
     @Column()
     updatedDate: Date;
 

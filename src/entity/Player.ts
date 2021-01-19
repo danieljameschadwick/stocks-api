@@ -33,6 +33,7 @@ export class Player extends BaseEntity {
     @JoinColumn({ name: 'teamId' })
     team?: Team;
 
+    @Field(type => Stock)
     @OneToOne(() => Stock, stock => stock.player, {
         cascade: true,
         nullable: true,
