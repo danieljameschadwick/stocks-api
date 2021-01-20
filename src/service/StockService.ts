@@ -42,11 +42,14 @@ export class StockService {
 
         try {
             stock = await this.stockRepository.createQueryBuilder('stock')
+                .addSelect('DATE(dateTime) as date')
                 .innerJoinAndSelect('stock.player', 'player')
                 .leftJoinAndSelect('stock.stockHistory', 'stockHistory')
                 .orderBy({
-                    'stockHistory.dateTime': 'DESC',
+                    'stockHistory.dateTime': 'ASC',
                 })
+                .where('stock.id = :id', { id })
+                .addGroupBy('date')
                 .getOne();
         } catch (error) {
             return new GetResponse(
@@ -59,6 +62,44 @@ export class StockService {
         if (stock === undefined) {
             return new GetResponse(
                 `Stock [${id}] could not found.`,
+                null,
+                HttpCodes.HTTP_STATUS_NOT_FOUND
+            );
+        }
+
+        return new GetResponse(
+            `Stock ${stock.abbreviation} [${stock.id}] found.`,
+            stock,
+            HttpCodes.HTTP_STATUS_OK
+        );
+    }
+
+    async getByAbbreviation(abbreviation: string): Promise<GetResponse> {
+        let stock = undefined;
+
+        try {
+            stock = await this.stockRepository.createQueryBuilder('stock')
+                .addSelect('DATE(dateTime) as date')
+                .innerJoinAndSelect('stock.player', 'player')
+                .leftJoinAndSelect('player.team', 'team')
+                .leftJoinAndSelect('stock.stockHistory', 'stockHistory')
+                .orderBy({
+                    'stockHistory.dateTime': 'ASC',
+                })
+                .where('stock.abbreviation = :abbreviation', { abbreviation })
+                .addGroupBy('date')
+                .getOne();
+        } catch (error) {
+            return new GetResponse(
+                `Unknown whilst finding Stock [${abbreviation}].`,
+                null,
+                HttpCodes.HTTP_STATUS_BAD_REQUEST
+            );
+        }
+
+        if (stock === undefined) {
+            return new GetResponse(
+                `Stock [${abbreviation}] could not found.`,
                 null,
                 HttpCodes.HTTP_STATUS_NOT_FOUND
             );

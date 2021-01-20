@@ -37,6 +37,21 @@ class StockController {
         return await this.stockService.get(id);
     }
 
+    @Get('/abbreviation/:abbreviation')
+    async getByAbbreviation(@Req() request: Request, @Res() response: Response) {
+        const abbreviation = request.params.abbreviation;
+
+        if (abbreviation === undefined) {
+            return new StockGetResponse(
+                'Couldn\'t find the abbreviation in the request.',
+                {},
+                HttpCodes.HTTP_STATUS_BAD_REQUEST
+            );
+        }
+
+        return await this.stockService.getByAbbreviation(abbreviation);
+    }
+
     @Post('/')
     async create(@Req() request: Request, @Res() response: Response) {
         const data = request.body;

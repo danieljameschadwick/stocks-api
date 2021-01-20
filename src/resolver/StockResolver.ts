@@ -13,12 +13,14 @@ export class StockResolver {
     @Query(() => Stock)
     async stock(@Arg('id') id: number) {
         return await this.stockRepository.createQueryBuilder('stock')
+            .addSelect('DATE(dateTime) as date')
             .innerJoinAndSelect('stock.player', 'player')
             .leftJoinAndSelect('stock.stockHistory', 'stockHistory')
             .orderBy({
-                'stockHistory.dateTime': 'DESC',
+                'stockHistory.dateTime': 'ASC',
             })
             .where('stock.id = :id', { id })
+            .addGroupBy('date')
             .getOne();
     }
 

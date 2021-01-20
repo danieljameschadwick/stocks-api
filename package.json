@@ -18,6 +18,7 @@
 		"@types/node": "^14.14.20",
 		"babel-core": "^7.0.0-bridge.0",
 		"class-validator": "^0.12.2",
+		"cors": "^2.8.5",
 		"express": "^4.17.1",
 		"glob": "^7.1.6",
 		"mysql": "^2.18.1",

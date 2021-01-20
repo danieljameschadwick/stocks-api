@@ -1,7 +1,7 @@
 import {
     Entity,
     Column,
-    PrimaryGeneratedColumn, BaseEntity, JoinColumn, ManyToOne,
+    PrimaryGeneratedColumn, BaseEntity, JoinColumn, ManyToOne, AfterLoad,
 } from 'typeorm';
 import { Stock } from './Stock';
 import { StockHistoryDTO } from '../dto/StockHistoryDTO';
