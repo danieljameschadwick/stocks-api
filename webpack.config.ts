@@ -3,10 +3,10 @@ const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
 
 module.exports = {
-    entry: './src/main.js',
+    entry: './src/Main.js',
     output: {
         path: path.join(__dirname, 'dist'),
-        filename: 'main.js'
+        filename: 'Main.js'
     },
     mode: 'development',
     devtool: 'source-map',
