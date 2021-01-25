@@ -1,5 +1,7 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
+const jwtStrategy = require('passport-jwt').Strategy;
+const extractJwt = require('passport-jwt').ExtractJwt;
 const jwt = require('jsonwebtoken');
 
 import 'reflect-metadata';
@@ -67,11 +69,26 @@ createConnection().then(async () => {
                 sub: user.id
             };
 
-            const token = jwt.sign(payload, 'a secret phrase!!');
-
-            return done(null, token, user);
+            return done(null, user);
         }
     ));
+
+    const opts = {
+        jwtFromRequest: extractJwt.fromAuthHeaderAsBearerToken(),
+        secretOrKey: 'TOP_SECRET',
+    };
+
+    passport.use(new jwtStrategy(opts, async function (jwt_payload, done) {
+        const userRepository = getManager().getRepository(User);
+
+        const user = await userRepository.findOne({id: jwt_payload.sub});
+
+        if (user) {
+            return done(null, user);
+        } else {
+            return done(null, false);
+        }
+    }));
 
     passport.serializeUser(function (user, done) {
         done(null, user.id);
@@ -84,13 +101,48 @@ createConnection().then(async () => {
         done(null, user);
     });
 
-    app.post('/login', passport.authenticate('local'), function (req, res) {
-        // If this function gets called, authentication was successful.
-        // `req.user` contains the authenticated user.
-        console.log(req.user);
+    app.post('/login', passport.authenticate('local'), function (req, res, next) {
+        return passport.authenticate('local', (err, user, info) => {
+            if (err) {
+                return;
+            }
 
-        res.redirect('/users/' + req.user.username);
+            const body = {id: user.id, username: user.username};
+            const token = jwt.sign({user: body}, 'TOP_SECRET');
+
+            return res.json({
+                success: true,
+                message: 'You have successfully logged in!',
+                token,
+                user: user,
+                info: info
+            });
+        })(req, res, next);
     });
+
+    passport.use(
+        new jwtStrategy(
+            {
+                secretOrKey: 'TOP_SECRET',
+                jwtFromRequest: extractJwt.fromUrlQueryParameter('secret_token')
+            },
+            async (token, done) => {
+                try {
+                    return done(null, token.user);
+                } catch (error) {
+                    return done(null, { verified: false })
+                }
+            }
+        )
+    );
+
+    app.post('/verify', passport.authenticate('jwt', {'session': false}),
+        function (req, res) {
+            res.send({
+                'verified': true,
+            });
+        }
+    );
 
     app.listen(port, () => {
         console.log(`App listening at http://localhost:${port}`);

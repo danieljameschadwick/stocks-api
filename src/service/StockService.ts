@@ -186,8 +186,6 @@ export class StockService {
                 );
             }
 
-            console.log(error);
-
             return new UpdateResponse(
                 `Unknown error whilst saving Stock ${stock.abbreviation} [${stock.id}].`,
                 null,
