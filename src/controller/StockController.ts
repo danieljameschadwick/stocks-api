@@ -5,6 +5,7 @@ import { StockService } from '../service/StockService';
 import { StockGetResponse } from '../dto/response/stock/StockGetResponse';
 import { StockDTO } from '../dto/StockDTO';
 import { PlayerService } from '../service/PlayerService';
+import { StockFormatter } from '../formatter/StockFormatter';
 
 @Controller('/stock')
 @UseBefore(json())
@@ -29,7 +30,7 @@ class StockController {
         if (id === undefined) {
             return new StockGetResponse(
                 'Couldn\'t find the ID in the request.',
-                {},
+                null,
                 HttpCodes.HTTP_STATUS_BAD_REQUEST
             );
         }
@@ -44,12 +45,14 @@ class StockController {
         if (abbreviation === undefined) {
             return new StockGetResponse(
                 'Couldn\'t find the abbreviation in the request.',
-                {},
+                null,
                 HttpCodes.HTTP_STATUS_BAD_REQUEST
             );
         }
 
-        return await this.stockService.getByAbbreviation(abbreviation);
+        const getResponse = await this.stockService.getByAbbreviation(abbreviation);
+
+        return StockFormatter.formatStock(getResponse.data);
     }
 
     @Post('/')
@@ -76,7 +79,7 @@ class StockController {
         ) {
             return response.send({
                 message: `No content sent.`,
-                data: {},
+                data: null,
             });
         }
 

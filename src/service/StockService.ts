@@ -75,7 +75,7 @@ export class StockService {
     }
 
     async getByAbbreviation(abbreviation: string): Promise<GetResponse> {
-        let stock = undefined;
+        let stock = null;
 
         try {
             stock = await this.stockRepository.createQueryBuilder('stock')

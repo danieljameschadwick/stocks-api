@@ -3,7 +3,8 @@
 A miniature API to drive a stocks application.
 
 ## todo
-- Refactor controllers
-- Implement GraphQL API using MongoDB
-- Create further entities (users, positions, teams)
+- Implement GraphQL API using MySQL/PostgreSQL
+- Create further entities (stock holdings), and services (UserService)
+- Hash passwords on Users (bcrypt?), store JWTs for easier expiration (?), don't return hashed passwords on login, move auth to /api/v1/auth
 - Investigate best practices for used packages (namely Typescript, NodeJS and TypeORM) and implement (vague yet unknown actions)
+- Implement early versioning for APIs

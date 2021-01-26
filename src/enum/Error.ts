@@ -1,3 +1,3 @@
 export const ORM = {
-    'DUPLICATED_ENTRY': 'ER_DUP_ENTRY',
+    DUPLICATED_ENTRY: 'ER_DUP_ENTRY',
 }
