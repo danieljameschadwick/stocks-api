@@ -105,6 +105,4 @@ class StockController {
     }
 }
 
-export {
-    StockController
-};
+export default StockController;

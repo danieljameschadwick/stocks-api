@@ -81,6 +81,4 @@ class TeamController {
     }
 }
 
-export {
-    TeamController
-};
+export default TeamController;

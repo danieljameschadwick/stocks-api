@@ -1,3 +1,5 @@
+import UserController from './controller/UserController';
+
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const jwtStrategy = require('passport-jwt').Strategy;
@@ -9,13 +11,14 @@ import { json } from 'express';
 import { createConnection, getManager } from 'typeorm';
 import { graphqlHTTP } from 'express-graphql';
 import { createExpressServer } from 'routing-controllers';
-import { MainController } from './controller/MainController';
-import { PlayerController } from './controller/PlayerController';
-import { TeamController } from './controller/TeamController';
-import { StockController } from './controller/StockController';
+import MainController from './controller/MainController';
+import PlayerController from './controller/PlayerController';
+import TeamController from './controller/TeamController';
+import StockController from './controller/StockController';
+import UserStockController from './controller/UserStockController';
 import { StockResolver } from './resolver/StockResolver';
 import { buildSchema } from 'type-graphql';
-import { CorsMiddleware } from './middleware/CorsMiddleware';
+import CorsMiddleware from './middleware/CorsMiddleware';
 import { User } from './entity/User';
 
 createConnection().then(async () => {
@@ -27,6 +30,8 @@ createConnection().then(async () => {
             PlayerController,
             TeamController,
             StockController,
+            UserController,
+            UserStockController,
         ],
         middlewares: [
             CorsMiddleware,

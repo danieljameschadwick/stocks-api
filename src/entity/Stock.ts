@@ -7,6 +7,8 @@ import { Player } from './Player';
 import { StockDTO } from '../dto/StockDTO';
 import { StockHistory } from './StockHistory';
 import { Field, ID, ObjectType } from 'type-graphql';
+import { UserStock } from './UserStock';
+import { User } from './User';
 
 @ObjectType()
 @Entity()
@@ -41,6 +43,12 @@ export class Stock extends BaseEntity {
     @Field()
     @Column()
     updatedDate: Date;
+
+    @Field(type => [Stock])
+    @OneToMany(() => Stock, stock => stock.userStocks, {
+        cascade: false
+    })
+    userStocks: UserStock[];
 
     constructor(abbreviation: string, player: Player, price?: number, updatedDate?: Date) {
         super();

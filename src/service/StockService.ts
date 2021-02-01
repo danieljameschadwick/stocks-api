@@ -9,6 +9,7 @@ import { StockUpdateResponse as UpdateResponse } from '../dto/response/stock/Sto
 import { StockDTO } from '../dto/StockDTO';
 import { ORM } from '../enum/Error';
 import { StockHistory } from '../entity/StockHistory';
+import { User } from '../entity/User';
 
 export class StockService {
     private stockRepository: Repository<Stock>;

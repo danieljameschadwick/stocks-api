@@ -5,7 +5,6 @@ import { PlayerDTO } from '../dto/PlayerDTO';
 import { TeamService } from '../service/TeamService';
 import { PlayerGetResponse } from '../dto/response/player/PlayerGetResponse';
 import { constants as HttpCodes } from 'http2';
-import { Stock } from '../entity/Stock';
 import { StockService } from '../service/StockService';
 
 @Controller('/player')
@@ -99,6 +98,4 @@ class PlayerController {
     }
 }
 
-export {
-    PlayerController
-};
+export default PlayerController;

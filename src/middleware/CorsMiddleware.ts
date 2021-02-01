@@ -6,7 +6,7 @@ import { NextFunction, Request, Response } from 'express';
  * so disabled any checking whilst in dev
  */
 @Middleware({ type: 'before' })
-export class CorsMiddleware implements ExpressMiddlewareInterface {
+class CorsMiddleware implements ExpressMiddlewareInterface {
     use(request: Request, response: Response, next?: NextFunction): any {
         response.setHeader('Access-Control-Allow-Origin', '*');
         response.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
@@ -15,3 +15,5 @@ export class CorsMiddleware implements ExpressMiddlewareInterface {
         next();
     }
 }
+
+export default CorsMiddleware;

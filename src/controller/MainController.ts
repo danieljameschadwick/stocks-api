@@ -13,6 +13,4 @@ class MainController {
     }
 }
 
-export {
-    MainController
-};
+export default MainController;

@@ -3,9 +3,11 @@ import {
     Column,
     Unique,
     PrimaryGeneratedColumn,
-    BaseEntity,
+    BaseEntity, ManyToOne, OneToMany,
 } from 'typeorm';
 import { Field, ID, ObjectType } from 'type-graphql';
+import { UserStock } from './UserStock';
+import { StockHistory } from './StockHistory';
 
 @ObjectType()
 @Entity()
@@ -27,6 +29,10 @@ export class User extends BaseEntity {
     @Field()
     @Column()
     password?: string;
+
+    @Field(type => [UserStock])
+    @OneToMany(() => UserStock, userStock => userStock.user)
+    stocks: UserStock[];
 
     constructor(username: string, email: string, password?: string) {
         super();

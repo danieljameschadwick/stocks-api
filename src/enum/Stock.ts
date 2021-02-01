@@ -1,4 +1,9 @@
-export const TREND_DIRECTION = {
-    UPWARDS: 'upwards',
-    DOWNWARDS: 'downwards',
+export const TREND_DIRECTION_HANDLE = {
+    UPWARDS: 'UPWARDS',
+    DOWNWARDS: 'DOWNWARDS',
+};
+
+export const TREND_DIRECTION_SYMBOL = {
+    UPWARDS: '+',
+    DOWNWARDS: '-',
 };
