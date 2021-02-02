@@ -3,6 +3,7 @@ import { constants as HttpCodes } from 'http2';
 import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethodResponse';
 import { Stock } from '../entity/Stock';
 import { UserStockBuyResponse as BuyResponse } from '../dto/response/userStock/UserStockBuyResponse';
+import { UserStockGetResponse as GetResponse } from '../dto/response/userStock/UserStockGetResponse';
 import { User } from '../entity/User';
 import { UserStock } from '../entity/UserStock';
 import { UserStockDTO } from '../dto/UserStockDTO';
@@ -18,8 +19,33 @@ class UserStockService {
         this.userRepository = getManager().getRepository(User);
     }
 
-    async get(id: number): Promise<UnimplementedMethodResponse> {
-        return new UnimplementedMethodResponse();
+    async get(username: string, abbreviation?: string): Promise<GetResponse> {
+        const user = await this.userRepository.findOne({ username: username });
+
+        if (user === undefined) {
+            return new GetResponse(
+                'User must be set.',
+                null,
+                HttpCodes.HTTP_STATUS_BAD_REQUEST
+            );
+        }
+
+        const queryBuilder = this.userStockRepository.createQueryBuilder('userstock')
+            .innerJoinAndSelect('userstock.user', 'user')
+            .innerJoinAndSelect('userstock.stock', 'stock')
+            .andWhere('user.username = :username', { username: username });
+
+        if (abbreviation !== undefined) {
+            queryBuilder.andWhere('stock.abbreviation = :abbreviation', { abbreviation: abbreviation });
+        }
+
+        const userStocks = await queryBuilder.getMany();
+
+        return new GetResponse(
+            `UserStocks found for User ${username}${ abbreviation ? ` for Stock $${abbreviation}.` : `.` }`,
+            userStocks,
+            HttpCodes.HTTP_STATUS_OK
+        );
     }
 
     async buy(userStockDTO: UserStockDTO): Promise<BuyResponse> {

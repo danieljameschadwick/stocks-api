@@ -17,7 +17,7 @@ export class UserStock extends BaseEntity {
     id?: number;
 
     @Field(type => User)
-    @ManyToOne(() => StockHistory, stockHistory => stockHistory.stock, {
+    @ManyToOne(() => User, user => user.stocks, {
         cascade: false
     })
     user: User;

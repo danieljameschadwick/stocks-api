@@ -15,9 +15,11 @@ class UserStockController {
         this.userStockService = new UserStockService();
     }
 
-    @Get('/')
+    @Get('/:abbreviation?')
     async get(@Req() request: Request, @Res() response: Response) {
-        return response.send('Unimplemented.');
+        const { username, abbreviation } = request.params;
+
+        return await this.userStockService.get(username, abbreviation);
     }
 
     @Post('/buy')
