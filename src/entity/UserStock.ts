@@ -2,7 +2,7 @@ import {
     Entity,
     Column,
     PrimaryGeneratedColumn,
-    BaseEntity, OneToOne, JoinColumn, ManyToOne, OneToMany,
+    BaseEntity, JoinColumn, ManyToOne,
 } from 'typeorm';
 import { Field, ID, ObjectType } from 'type-graphql';
 import { Stock } from './Stock';
@@ -45,21 +45,13 @@ export class UserStock extends BaseEntity {
     @Column()
     dateTime: Date;
 
-    constructor(user: User, stock: Stock, quantity: number, dateTime?: Date) {
+    constructor(user: User, stock: Stock, price: number, quantity: number, dateTime?: Date) {
         super();
 
         this.user = user;
         this.stock = stock;
+        this.boughtPrice = price;
         this.quantity = quantity;
-
-        if (
-            stock === undefined
-            || stock.price === undefined
-        ) {
-            throw new Error('Stock is undefined');
-        }
-
-        this.boughtPrice = stock.price ?? 0;
 
         this.dateTime = dateTime ?? new Date();
     }

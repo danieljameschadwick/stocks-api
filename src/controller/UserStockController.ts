@@ -1,7 +1,7 @@
 import { json, Request, Response } from 'express';
 import { Controller, Delete, Get, Post, Req, Res, UseBefore } from 'routing-controllers';
 import UserService from '../service/UserService';
-import { UserStockService } from '../service/UserStockService';
+import UserStockService from '../service/UserStockService';
 import { UserStockDTO } from '../dto/UserStockDTO';
 
 @Controller('/user/:username/stock')

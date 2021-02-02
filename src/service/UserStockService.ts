@@ -7,7 +7,7 @@ import { User } from '../entity/User';
 import { UserStock } from '../entity/UserStock';
 import { UserStockDTO } from '../dto/UserStockDTO';
 
-export class UserStockService {
+class UserStockService {
     private userStockRepository: Repository<UserStock>;
     private stockRepository: Repository<Stock>;
     private userRepository: Repository<User>;
@@ -18,7 +18,7 @@ export class UserStockService {
         this.userRepository = getManager().getRepository(User);
     }
 
-    async get(id: number) {
+    async get(id: number): Promise<UnimplementedMethodResponse> {
         return new UnimplementedMethodResponse();
     }
 
@@ -39,8 +39,6 @@ export class UserStockService {
             );
         }
 
-        console.log({ user, stock })
-
         if (null === stock.price) {
             return new BuyResponse(
                 `No price set on Stock [${abbreviation}].`,
@@ -49,10 +47,13 @@ export class UserStockService {
             );
         }
 
+        let userStock = undefined;
+
         try {
-            let userStock = new UserStock(
+            userStock = new UserStock(
                 user,
                 stock,
+                stock.price,
                 quantity,
             );
 
@@ -65,18 +66,28 @@ export class UserStockService {
             );
         }
 
+        if (userStock === undefined) {
+            return new BuyResponse(
+                `Unknown error whilst saving UserStock ${abbreviation} [${quantity}] for ${username}.`,
+                null,
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
+            );
+        }
+
         return new BuyResponse(
-            `UserStock $${userStock.stock.abbreviation}, ${userStock.quantity} [${userStock.filledPrice}] for ${userStock.user.username} created.`,
+            `UserStock: ${userStock.user.username} bought ${userStock.quantity} of $${userStock.stock.abbreviation} for ${userStock.boughtPrice} filled.`,
             userStock,
             HttpCodes.HTTP_STATUS_CREATED,
         );
     }
 
-    async sell(userStock: UserStock, user: User) {
-
+    async sell(userStock: UserStock, user: User): Promise<UnimplementedMethodResponse> {
+        return new UnimplementedMethodResponse();
     }
 
     async delete(id: number): Promise<UnimplementedMethodResponse> {
         return new UnimplementedMethodResponse();
     }
 }
+
+export default UserStockService;
