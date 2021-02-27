@@ -8,24 +8,23 @@ import { StockDTO } from '../dto/StockDTO';
 import { StockHistory } from './StockHistory';
 import { Field, ID, ObjectType } from 'type-graphql';
 import { UserStock } from './UserStock';
-import { User } from './User';
 
 @ObjectType()
-@Entity()
+@Entity('tblStock')
 export class Stock extends BaseEntity {
     @Field(type => ID)
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({ name: 'intStockId' })
     id?: number;
 
     @Field()
-    @Column()
+    @Column({ name: 'strAbbreviation' })
     abbreviation: string;
 
     @Field(type => Player)
     @OneToOne(() => Player, player => player.stock, {
         cascade: false
     })
-    @JoinColumn({ name: 'playerId'})
+    @JoinColumn({ name: 'intPlayerId' })
     player: Player;
 
     @Field(type => [StockHistory])
@@ -36,12 +35,13 @@ export class Stock extends BaseEntity {
 
     @Field({ nullable: true })
     @Column({
+        name: 'intPrice',
         nullable: true
     })
     price?: number;
 
     @Field()
-    @Column()
+    @Column({ name: 'dtmUpdatedDate' })
     updatedDate: Date;
 
     @Field(type => [Stock])

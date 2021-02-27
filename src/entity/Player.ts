@@ -13,24 +13,24 @@ import { PlayerDTO } from '../dto/PlayerDTO';
 import { Field, ID, ObjectType } from 'type-graphql';
 
 @ObjectType()
-@Entity()
+@Entity('tblPlayer')
 @Unique(['firstName', 'lastName'])
 export class Player extends BaseEntity {
     @Field(type => ID)
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({ name: 'intPlayerId' })
     id?: number;
 
     @Field()
-    @Column()
+    @Column({ name: 'strFirstName' })
     firstName: string;
 
     @Field()
-    @Column()
+    @Column({ name: 'strLastName' })
     lastName: string;
 
     @Field(type => Team)
     @ManyToOne(() => Team, team => team.players, { nullable: true })
-    @JoinColumn({ name: 'teamId' })
+    @JoinColumn({ name: 'intTeamId' })
     team?: Team;
 
     @Field(type => Stock)
@@ -38,7 +38,7 @@ export class Player extends BaseEntity {
         cascade: true,
         nullable: true,
     })
-    @JoinColumn({ name: 'stockId'})
+    @JoinColumn({ name: 'intStockId' })
     stock?: Stock;
 
     constructor(firstName: string, lastName: string, team?: Team, stock?: Stock) {

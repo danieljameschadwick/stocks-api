@@ -8,25 +8,25 @@ import { StockHistoryDTO } from '../dto/StockHistoryDTO';
 import { Field, ID, ObjectType } from 'type-graphql';
 
 @ObjectType()
-@Entity()
+@Entity('tblStockHistory')
 export class StockHistory extends BaseEntity {
     @Field(type => ID)
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({ name: 'intStockHistoryId' })
     id?: number;
 
     @Field(type => Stock)
     @ManyToOne(() => Stock, stock => stock.stockHistory, {
         cascade: false
     })
-    @JoinColumn({ name: 'stockId'})
+    @JoinColumn({ name: 'intStockId' })
     stock: Stock;
 
     @Field()
-    @Column()
+    @Column({ name: 'intPrice' })
     price: number;
 
     @Field()
-    @Column()
+    @Column({ name: 'dtmCreated' })
     dateTime: Date;
 
     constructor(stock: Stock, price: number, dateTime?: Date) {

@@ -3,31 +3,30 @@ import {
     Column,
     Unique,
     PrimaryGeneratedColumn,
-    BaseEntity, ManyToOne, OneToMany,
+    BaseEntity, OneToMany,
 } from 'typeorm';
 import { Field, ID, ObjectType } from 'type-graphql';
 import { UserStock } from './UserStock';
-import { StockHistory } from './StockHistory';
 
 @ObjectType()
-@Entity()
+@Entity('tblUser')
 @Unique(['username'])
 @Unique(['email'])
 export class User extends BaseEntity {
     @Field(type => ID)
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({ name: 'intUserId' })
     id?: number;
 
     @Field()
-    @Column()
+    @Column({ name: 'strUsername' })
     username: string;
 
     @Field()
-    @Column()
+    @Column({ name: 'strEmail' })
     email: string;
 
     @Field()
-    @Column()
+    @Column({ name: 'strPassword' })
     password?: string;
 
     @Field(type => [UserStock])

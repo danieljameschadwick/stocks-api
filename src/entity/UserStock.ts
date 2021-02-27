@@ -10,10 +10,10 @@ import { User } from './User';
 import { StockHistory } from './StockHistory';
 
 @ObjectType()
-@Entity()
+@Entity('tblUserStock')
 export class UserStock extends BaseEntity {
     @Field(type => ID)
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({ name: 'intUserStockId' })
     id?: number;
 
     @Field(type => User)
@@ -24,25 +24,26 @@ export class UserStock extends BaseEntity {
 
     @Field(type => Stock)
     @ManyToOne(() => Stock, stock => stock.userStocks)
-    @JoinColumn({ name: 'stockId'})
+    @JoinColumn({ name: 'intStockId' })
     stock: Stock;
 
     @Field()
-    @Column()
+    @Column({ name: 'intQuantity' })
     quantity: number;
 
     @Field()
-    @Column()
+    @Column({ name: 'intBoughtPrice' })
     boughtPrice: number;
 
     @Field()
     @Column({
+        name: 'intFilledPrice',
         nullable: true
     })
     filledPrice?: number;
 
     @Field()
-    @Column()
+    @Column({ name: 'dtmCreated' })
     dateTime: Date;
 
     constructor(user: User, stock: Stock, price: number, quantity: number, dateTime?: Date) {

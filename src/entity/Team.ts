@@ -9,20 +9,20 @@ import { Player } from './Player';
 import { Field, ID, ObjectType } from 'type-graphql';
 
 @ObjectType()
-@Entity()
+@Entity('tblTeam')
 @Unique(['name'])
 @Unique(['abbreviation'])
 export class Team extends BaseEntity {
     @Field(type => ID)
-    @PrimaryGeneratedColumn()
+    @PrimaryGeneratedColumn({ name: 'intTeamId' })
     id?: number;
 
     @Field()
-    @Column()
+    @Column({ name: 'strName' })
     name: string;
 
     @Field()
-    @Column()
+    @Column({ name: 'strAbbreviation' })
     abbreviation: string;
 
     @Field(type => [Player])
