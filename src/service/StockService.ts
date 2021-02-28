@@ -60,7 +60,10 @@ export class StockService {
             );
         }
 
-        if (stock === undefined) {
+        if (
+            stock === undefined
+            || stock === null
+        ) {
             return new GetResponse(
                 `Stock [${id}] could not found.`,
                 null,
@@ -80,15 +83,14 @@ export class StockService {
 
         try {
             stock = await this.stockRepository.createQueryBuilder('stock')
-                .addSelect('DATE(dateTime) as date')
+                .addSelect('DATE(stock.updatedDate) as date')
                 .innerJoinAndSelect('stock.player', 'player')
                 .leftJoinAndSelect('player.team', 'team')
                 .leftJoinAndSelect('stock.stockHistory', 'stockHistory')
                 .orderBy({
                     'stockHistory.dateTime': 'ASC',
                 })
-                .where('stock.abbreviation = :abbreviation', { abbreviation })
-                .addGroupBy('date')
+                .where('stock.abbreviation = :abbreviation', { abbreviation: abbreviation })
                 .getOne();
         } catch (error) {
             return new GetResponse(

@@ -52,6 +52,10 @@ class StockController {
 
         const getResponse = await this.stockService.getByAbbreviation(abbreviation);
 
+        if (getResponse.code !== HttpCodes.HTTP_STATUS_OK) {
+            return getResponse;
+        }
+
         return StockFormatter.formatStock(getResponse.data);
     }
 

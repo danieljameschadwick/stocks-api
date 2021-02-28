@@ -24,9 +24,6 @@ class UserStockController {
 
     @Post('/buy')
     async buy(@Req() request: Request, @Res() response: Response) {
-        console.log(request.params);
-        console.log(request.body);
-
         const username = request.params.username.toString();
         const { stock, quantity }  = request.body;
 
@@ -41,9 +38,6 @@ class UserStockController {
 
     @Post('/sell')
     async sell(@Req() request: Request, @Res() response: Response) {
-        console.log(request.params);
-        console.log(request.body);
-
         const username = request.params.username.toString();
         const { id }  = request.body;
 
