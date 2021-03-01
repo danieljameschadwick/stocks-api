@@ -9,6 +9,7 @@ import { UserStockGetAllResponse as GetAllResponse } from '../dto/response/userS
 import { User } from '../entity/User';
 import { UserStock } from '../entity/UserStock';
 import { UserStockDTO } from '../dto/UserStockDTO';
+import { formatStockName } from 'stocks-core/dist/lib/stock';
 
 class UserStockService {
     private userStockRepository: Repository<UserStock>;
@@ -132,7 +133,7 @@ class UserStockService {
         }
 
         return new BuyResponse(
-            `UserStock: ${userStock.user.username} bought ${userStock.quantity} of $${userStock.stock.abbreviation} for ${userStock.boughtPrice} filled.`,
+            `UserStock: ${user.username} bought ${userStock.quantity} of ${formatStockName(stock.abbreviation)} for $${userStock.boughtPrice} filled.`,
             userStock,
             HttpCodes.HTTP_STATUS_CREATED,
         );
@@ -177,7 +178,7 @@ class UserStockService {
         userStock.sell();
 
         try {
-            await this.userStockRepository.update(id, userStock)
+            await this.userStockRepository.update(id, userStock);
         } catch (error) {
             return new SellResponse(
                 `Unknown error whilst saving UserStock [${id}].`,
