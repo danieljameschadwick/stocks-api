@@ -16,16 +16,16 @@ class UserStockController {
     }
 
     @Get('/:abbreviation?')
-    async get(@Req() request: Request, @Res() response: Response) {
+    async getAll(@Req() request: Request, @Res() response: Response) {
         const { username, abbreviation } = request.params;
 
-        return await this.userStockService.get(username, abbreviation);
+        return await this.userStockService.getAll(username, abbreviation);
     }
 
     @Post('/buy')
     async buy(@Req() request: Request, @Res() response: Response) {
         const username = request.params.username.toString();
-        const { stock, quantity }  = request.body;
+        const { stock, quantity } = request.body;
 
         const userStock = new UserStockDTO(
             username,
@@ -36,12 +36,12 @@ class UserStockController {
         return await this.userStockService.buy(userStock);
     }
 
-    @Post('/sell')
+    @Post('/sell/:id')
     async sell(@Req() request: Request, @Res() response: Response) {
         const username = request.params.username.toString();
-        const { id }  = request.body;
+        const id = parseInt(request.params.id);
 
-        return response.send('Unimplemented.');
+        return this.userStockService.sell(id, username);
     }
 
     @Delete('/:id')

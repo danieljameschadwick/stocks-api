@@ -3,7 +3,9 @@ import { constants as HttpCodes } from 'http2';
 import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethodResponse';
 import { Stock } from '../entity/Stock';
 import { UserStockBuyResponse as BuyResponse } from '../dto/response/userStock/UserStockBuyResponse';
+import { UserStockSellResponse as SellResponse } from '../dto/response/userStock/UserStockSellResponse';
 import { UserStockGetResponse as GetResponse } from '../dto/response/userStock/UserStockGetResponse';
+import { UserStockGetAllResponse as GetAllResponse } from '../dto/response/userStock/UserStockGetAllResponse';
 import { User } from '../entity/User';
 import { UserStock } from '../entity/UserStock';
 import { UserStockDTO } from '../dto/UserStockDTO';
@@ -19,21 +21,50 @@ class UserStockService {
         this.userRepository = getManager().getRepository(User);
     }
 
-    async get(username: string, abbreviation?: string): Promise<GetResponse> {
+    async get(id: number): Promise<GetResponse> {
+        const queryBuilder = this.userStockRepository.createQueryBuilder('userStock')
+            .innerJoinAndSelect('userStock.user', 'user')
+            .innerJoinAndSelect('userStock.stock', 'stock')
+            .andWhere('userStock.id = :id', { id })
+            .andWhere('userStock.filledPrice IS null')
+        ;
+
+        const userStock = await queryBuilder.getOneOrFail();
+
+        if (userStock === undefined) {
+            return new GetResponse(
+                `UserStock [${id}] not found.`,
+                null,
+                HttpCodes.HTTP_STATUS_NOT_FOUND
+            );
+        }
+
+        const { user, stock } = userStock;
+
+        return new GetResponse(
+            `UserStock found for User ${user.username} ${stock.abbreviation ? ` for Stock $${stock.abbreviation}.` : `.`}`,
+            userStock,
+            HttpCodes.HTTP_STATUS_OK
+        );
+    }
+
+    async getAll(username: string, abbreviation?: string): Promise<GetAllResponse> {
         const user = await this.userRepository.findOne({ username: username });
 
         if (user === undefined) {
-            return new GetResponse(
+            return new GetAllResponse(
                 'User must be set.',
                 null,
                 HttpCodes.HTTP_STATUS_BAD_REQUEST
             );
         }
 
-        const queryBuilder = this.userStockRepository.createQueryBuilder('userstock')
-            .innerJoinAndSelect('userstock.user', 'user')
-            .innerJoinAndSelect('userstock.stock', 'stock')
-            .andWhere('user.username = :username', { username: username });
+        const queryBuilder = this.userStockRepository.createQueryBuilder('userStock')
+            .innerJoinAndSelect('userStock.user', 'user')
+            .innerJoinAndSelect('userStock.stock', 'stock')
+            .andWhere('user.username = :username', { username: username })
+            .andWhere('userStock.filledPrice IS null')
+        ;
 
         if (abbreviation !== undefined) {
             queryBuilder.andWhere('stock.abbreviation = :abbreviation', { abbreviation: abbreviation });
@@ -41,8 +72,8 @@ class UserStockService {
 
         const userStocks = await queryBuilder.getMany();
 
-        return new GetResponse(
-            `UserStocks found for User ${username}${ abbreviation ? ` for Stock $${abbreviation}.` : `.` }`,
+        return new GetAllResponse(
+            `UserStocks found for User ${username}${abbreviation ? ` for Stock $${abbreviation}.` : `.`}`,
             userStocks,
             HttpCodes.HTTP_STATUS_OK
         );
@@ -107,8 +138,59 @@ class UserStockService {
         );
     }
 
-    async sell(userStock: UserStock, user: User): Promise<UnimplementedMethodResponse> {
-        return new UnimplementedMethodResponse();
+    async sell(id: number, username: string): Promise<SellResponse> {
+        let getResponse = undefined;
+
+        try {
+            getResponse = await this.get(id);
+        } catch (error) {
+            return new SellResponse(
+                `Unknown error whilst retrieving UserStock [${id}].`,
+                null,
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
+            );
+        }
+
+        const userStock = getResponse.data;
+
+        if (
+            getResponse.data === undefined
+            || getResponse.data === null
+        ) {
+            return new SellResponse(
+                `Couldn't find UserStock [${id}]`,
+                null,
+                HttpCodes.HTTP_STATUS_NOT_FOUND,
+            );
+        }
+
+        const { user } = userStock;
+
+        if (user.username !== username) {
+            return new SellResponse(
+                `Username [${username}] does not match UserStock.`,
+                null,
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
+            );
+        }
+
+        userStock.sell();
+
+        try {
+            await this.userStockRepository.update(id, userStock)
+        } catch (error) {
+            return new SellResponse(
+                `Unknown error whilst saving UserStock [${id}].`,
+                null,
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
+            );
+        }
+
+        return new SellResponse(
+            `UserStock [${userStock.id}] sold at ${userStock.filledPrice}.`,
+            userStock,
+            HttpCodes.HTTP_STATUS_OK,
+        );
     }
 
     async delete(id: number): Promise<UnimplementedMethodResponse> {

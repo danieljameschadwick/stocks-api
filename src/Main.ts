@@ -60,14 +60,14 @@ createConnection().then(async () => {
         async function (username, password, done) {
             const userRepository = getManager().getRepository(User);
 
-            const user = await userRepository.findOne({username: username});
+            const user = await userRepository.findOne({ username: username });
 
             if (!user) {
-                return done(null, false, {message: 'Incorrect username.'});
+                return done(null, false, { message: 'Incorrect username.' });
             }
 
             if (user.password !== password) {
-                return done(null, false, {message: 'Incorrect password.'});
+                return done(null, false, { message: 'Incorrect password.' });
             }
 
             const payload = {
@@ -86,7 +86,7 @@ createConnection().then(async () => {
     passport.use(new jwtStrategy(opts, async function (jwt_payload, done) {
         const userRepository = getManager().getRepository(User);
 
-        const user = await userRepository.findOne({id: jwt_payload.sub});
+        const user = await userRepository.findOne({ id: jwt_payload.sub });
 
         if (user) {
             return done(null, user);
@@ -101,7 +101,7 @@ createConnection().then(async () => {
 
     passport.deserializeUser(async function (id, done) {
         const userRepository = getManager().getRepository(User);
-        const user = await userRepository.findOne({id: id});
+        const user = await userRepository.findOne({ id: id });
 
         done(null, user);
     });
@@ -112,8 +112,8 @@ createConnection().then(async () => {
                 return;
             }
 
-            const body = {id: user.id, username: user.username};
-            const token = jwt.sign({user: body}, 'TOP_SECRET');
+            const body = { id: user.id, username: user.username };
+            const token = jwt.sign({ user: body }, 'TOP_SECRET');
 
             return res.json({
                 success: true,
@@ -135,13 +135,13 @@ createConnection().then(async () => {
                 try {
                     return done(null, token.user);
                 } catch (error) {
-                    return done(null, { verified: false })
+                    return done(null, { verified: false });
                 }
             }
         )
     );
 
-    app.post('/verify', passport.authenticate('jwt', {'session': false}),
+    app.post('/verify', passport.authenticate('jwt', { 'session': false }),
         function (req, res) {
             res.send({
                 'verified': true,

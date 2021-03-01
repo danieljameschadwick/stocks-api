@@ -10,9 +10,13 @@ export class UserStockDTO {
     @IsNumber()
     quantity: number;
 
-    constructor(username: string, abbreviation: string, quantity: number) {
+    @IsNumber()
+    id?: number;
+
+    constructor(username: string, abbreviation: string, quantity: number, id?: number) {
         this.username = username;
         this.abbreviation = abbreviation;
         this.quantity = quantity;
+        this.id = id;
     }
 }

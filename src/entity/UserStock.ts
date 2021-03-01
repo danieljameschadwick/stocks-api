@@ -56,4 +56,12 @@ export class UserStock extends BaseEntity {
 
         this.dateTime = dateTime ?? new Date();
     }
+
+    sell(): void {
+        this.filledPrice = this.stock.price;
+    }
+
+    isSold(): boolean {
+        return this.filledPrice !== null;
+    }
 }
