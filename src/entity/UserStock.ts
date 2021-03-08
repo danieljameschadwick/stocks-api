@@ -28,17 +28,30 @@ export class UserStock extends BaseEntity {
     stock: Stock;
 
     @Field()
-    @Column({ name: 'intQuantity' })
+    @Column({
+        name: 'dblQuantity',
+        type: 'decimal',
+        precision: 10,
+        scale: 2,
+    })
     quantity: number;
 
     @Field()
-    @Column({ name: 'intBoughtPrice' })
+    @Column({
+        name: 'dblBoughtPrice',
+        type: 'decimal',
+        precision: 10,
+        scale: 2,
+    })
     boughtPrice: number;
 
     @Field()
     @Column({
-        name: 'intFilledPrice',
-        nullable: true
+        name: 'dblFilledPrice',
+        type: 'decimal',
+        precision: 10,
+        scale: 2,
+        nullable: true,
     })
     filledPrice?: number;
 
