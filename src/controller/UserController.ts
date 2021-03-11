@@ -18,7 +18,9 @@ class UserController {
 
     @Get('/:id')
     async get(@Req() request: Request, @Res() response: Response) {
-        return response.send('Unimplemented.');
+        const id = parseInt(request.params.id);
+
+        return await this.userService.get(id);
     }
 
     @Post('/')

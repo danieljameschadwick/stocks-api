@@ -3,10 +3,13 @@ import {
     Column,
     Unique,
     PrimaryGeneratedColumn,
-    BaseEntity, OneToMany,
+    BaseEntity,
+    OneToMany,
+    OneToOne, JoinColumn,
 } from 'typeorm';
 import { Field, ID, ObjectType } from 'type-graphql';
 import { UserStock } from './UserStock';
+import { UserBalance } from './UserBalance';
 
 @ObjectType()
 @Entity('tblUser')
@@ -28,6 +31,16 @@ export class User extends BaseEntity {
     @Field()
     @Column({ name: 'strPassword' })
     password?: string;
+
+    @Field(type => UserBalance)
+    @OneToOne(() => UserBalance, balance => balance.user, {
+        cascade: true,
+        nullable: true,
+    })
+    @JoinColumn({
+        name: 'intUserBalanceId',
+    })
+    balance?: UserBalance;
 
     @Field(type => [UserStock])
     @OneToMany(() => UserStock, userStock => userStock.user)

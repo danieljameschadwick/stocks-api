@@ -66,7 +66,8 @@ class StockController {
         return await this.stockService.create(
             new StockDTO(
                 data.abbreviation,
-                data.player
+                data.player,
+                data.price ?? null
             )
         );
     }

@@ -35,7 +35,10 @@ export class Stock extends BaseEntity {
 
     @Field({ nullable: true })
     @Column({
-        name: 'intPrice',
+        name: 'dblPrice',
+        type: 'decimal',
+        precision: 10,
+        scale: 2,
         nullable: true
     })
     price?: number;
