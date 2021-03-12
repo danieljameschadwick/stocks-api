@@ -2,7 +2,6 @@ import { getManager, Repository } from 'typeorm';
 import { TeamDTO } from '../dto/TeamDTO';
 import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethodResponse';
 import { UserGetResponse as GetResponse } from '../dto/response/user/UserGetResponse';
-import { User } from '../entity/User';
 import { UserDTO } from '../dto/UserDTO';
 import { constants as HttpCodes } from 'http2';
 import { UserRepository } from '../repository/UserRepository';

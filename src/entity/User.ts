@@ -40,7 +40,7 @@ export class User extends BaseEntity {
     @JoinColumn({
         name: 'intUserBalanceId',
     })
-    userBalance?: UserBalance;
+    userBalance: UserBalance;
 
     @Field(type => [UserStock])
     @OneToMany(() => UserStock, userStock => userStock.user)
@@ -52,14 +52,11 @@ export class User extends BaseEntity {
         this.username = username;
         this.email = email;
         this.password = password;
+        this.userBalance = new UserBalance(this);
     }
 
     balance(): number
     {
-        if (this.userBalance === null) {
-            throw new NoEntityFound('No balance set.');
-        }
-
         return this.userBalance.balance;
     }
 }

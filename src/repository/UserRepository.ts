@@ -6,8 +6,8 @@ export class UserRepository extends Repository<User> {
     getBuilder(): SelectQueryBuilder<User>
     {
         return this.createQueryBuilder('user')
-            .leftJoinAndSelect('user.stocks', 'stocks')
-            .leftJoinAndSelect('user.userBalance', 'balance');
+            .innerJoinAndSelect('user.stocks', 'stocks')
+            .innerJoinAndSelect('user.userBalance', 'balance');
     }
 
     async getOneByUsername(username: string): Promise<User|undefined>
@@ -16,5 +16,4 @@ export class UserRepository extends Repository<User> {
             .where('user.username = :username', { username })
             .getOne();
     }
-
 }
