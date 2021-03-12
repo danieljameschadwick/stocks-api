@@ -105,6 +105,16 @@ class UserStockService {
             );
         }
 
+        const orderTotal = stock.price * quantity;
+
+        if (user.balance() < orderTotal) {
+            return new BuyResponse(
+                `User ${user.username} [${user.id}] doesn't have enough funds.`,
+                null,
+                HttpCodes.HTTP_STATUS_BAD_REQUEST
+            );
+        }
+
         let userStock = undefined;
 
         try {

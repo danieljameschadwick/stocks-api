@@ -17,7 +17,7 @@ export class UserBalance extends BaseEntity {
     id?: number;
 
     @Field(type => User)
-    @OneToOne(() => User, user => user.balance, {
+    @OneToOne(() => User, user => user.userBalance, {
         cascade: false,
     })
     @JoinColumn({

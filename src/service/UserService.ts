@@ -5,12 +5,13 @@ import { UserGetResponse as GetResponse } from '../dto/response/user/UserGetResp
 import { User } from '../entity/User';
 import { UserDTO } from '../dto/UserDTO';
 import { constants as HttpCodes } from 'http2';
+import { UserRepository } from '../repository/UserRepository';
 
 class UserService {
-    private userRepository: Repository<User>;
+    private userRepository: UserRepository;
 
     constructor() {
-        this.userRepository = getManager().getRepository(User);
+        this.userRepository = getManager().getCustomRepository(UserRepository);
     }
 
     async getAll(): Promise<UnimplementedMethodResponse> {
@@ -23,7 +24,7 @@ class UserService {
         try {
             user = await this.userRepository.createQueryBuilder('user')
                 .innerJoinAndSelect('user.stocks', 'userStocks')
-                .leftJoinAndSelect('user.balance', 'balance')
+                .leftJoinAndSelect('user.userBalance', 'balance')
                 .where('user.id = :id', { id })
                 .getOneOrFail();
         } catch (error) {
@@ -46,6 +47,34 @@ class UserService {
 
         return new GetResponse(
             `Found User ${user.username} ${id}`,
+            user,
+            HttpCodes.HTTP_STATUS_OK
+        );
+    }
+
+    async getByUsername(username: string): Promise<GetResponse> {
+        let user = undefined;
+
+        try {
+            user = await this.userRepository.getOneByUsername(username);
+        } catch (error) {
+            return new GetResponse(
+                `Error occured finding User [${username}]`,
+                null,
+                HttpCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR
+            );
+        }
+
+        if (user === undefined) {
+            return new GetResponse(
+                `Couldn\'t find User [${username}]`,
+                null,
+                HttpCodes.HTTP_STATUS_NOT_FOUND
+            );
+        }
+
+        return new GetResponse(
+            `Found User ${user.username} [${user.id}]`,
             user,
             HttpCodes.HTTP_STATUS_OK
         );

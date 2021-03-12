@@ -10,7 +10,7 @@ import 'reflect-metadata';
 import { json } from 'express';
 import { createConnection, getManager } from 'typeorm';
 import { graphqlHTTP } from 'express-graphql';
-import { createExpressServer } from 'routing-controllers';
+import { Action, createExpressServer } from 'routing-controllers';
 import MainController from './controller/MainController';
 import PlayerController from './controller/PlayerController';
 import TeamController from './controller/TeamController';
@@ -20,6 +20,7 @@ import { StockResolver } from './resolver/StockResolver';
 import { buildSchema } from 'type-graphql';
 import CorsMiddleware from './middleware/CorsMiddleware';
 import { User } from './entity/User';
+import UserService from './service/UserService';
 
 createConnection().then(async () => {
     const app = createExpressServer({
@@ -35,14 +36,31 @@ createConnection().then(async () => {
         ],
         middlewares: [
             CorsMiddleware,
-        ]
+        ],
+        authorizationChecker: (action: Action) => new Promise<boolean>((resolve, reject) => {
+            passport.authenticate('jwt', (err, user) => {
+                if (err) {
+                    return reject(err);
+                }
+
+                if (!user) {
+                    return resolve(false);
+                }
+
+                action.request.user = user;
+                return resolve(true);
+            })(action.request, action.response, action.next);
+        }),
+        currentUserChecker: (action: Action) => action.request.user,
     });
     const port = 4000;
 
     app.use(json());
 
     const schema = await buildSchema({
-        resolvers: [StockResolver]
+        resolvers: [
+            StockResolver,
+        ],
     });
 
     app.use(
@@ -58,9 +76,10 @@ createConnection().then(async () => {
 
     passport.use(new LocalStrategy(
         async function (username, password, done) {
-            const userRepository = getManager().getRepository(User);
+            const userService = new UserService();
 
-            const user = await userRepository.findOne({ username: username });
+            const userResponse = await userService.getByUsername(username);
+            const user = userResponse.data;
 
             if (!user) {
                 return done(null, false, { message: 'Incorrect username.' });
