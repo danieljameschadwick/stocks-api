@@ -23,6 +23,13 @@ class UserController {
         return await this.userService.get(id);
     }
 
+    @Get('/username/:username')
+    async getByUsername(@Req() request: Request, @Res() response: Response) {
+        const username = request.params.username;
+
+        return await this.userService.getByUsername(username);
+    }
+
     @Post('/')
     async create(@Req() request: Request, @Res() response: Response) {
         return response.send('Unimplemented.');
