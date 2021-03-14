@@ -20,6 +20,8 @@ export class UserStock extends BaseEntity {
     @ManyToOne(() => User, user => user.stocks, {
         cascade: false
     })
+    @JoinColumn({ name: 'intUserId' })
+
     user: User;
 
     @Field(type => Stock)

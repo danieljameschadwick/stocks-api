@@ -22,6 +22,13 @@ class UserStockController {
         return await this.userStockService.getAll(username, abbreviation);
     }
 
+    @Get('/id/:id')
+    async get(@Req() request: Request, @Res() response: Response) {
+        const id = parseInt(request.params.id);
+
+        return await this.userStockService.get(id);
+    }
+
     @Post('/buy')
     async buy(@Req() request: Request, @Res() response: Response) {
         const username = request.params.username.toString();
