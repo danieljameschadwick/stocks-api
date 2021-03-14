@@ -47,8 +47,8 @@ export class Stock extends BaseEntity {
     @Column({ name: 'dtmUpdatedDate' })
     updatedDate: Date;
 
-    @Field(type => [Stock])
-    @OneToMany(() => Stock, stock => stock.userStocks, {
+    @Field(type => [UserStock])
+    @OneToMany(() => UserStock, stock => stock.stock, {
         cascade: false
     })
     userStocks: UserStock[];

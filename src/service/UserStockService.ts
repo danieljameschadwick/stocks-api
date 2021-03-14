@@ -63,32 +63,13 @@ class UserStockService {
             );
         }
 
-        const queryBuilder = this.userRepository.createQueryBuilder('user')
-            .select([
-                "user.id",
-            ])
-            .innerJoin('user.stocks', 'userStock')
+        const queryBuilder = this.userStockRepository.createQueryBuilder('userStock')
+            .select(['userStock', 'stock'])
+            .leftJoin('userStock.user', 'user')
             .innerJoin('userStock.stock', 'stock')
-            // .andWhere('username = :username', { username: username })
+            .andWhere('user.username = :username', { username: username })
             .andWhere('userStock.filledPrice IS null')
         ;
-
-        // const queryBuilder = this.userStockRepository.createQueryBuilder('userStock')
-        //     .select([
-        //         'userStock.id',
-        //         // 'userStock.boughtPrice',
-        //         // 'stock',
-        //         // 'user.id',
-        //         // 'user.id',
-        //         // 'user.username',
-        //         'stock.id',
-        //         'stock.abbreviation',
-        //     ])
-        //     .leftJoin('userStock.user', 'user')
-        //     .innerJoin('userStock.stock', 'stock')
-        //     // .andWhere('username = :username', { username: username })
-        //     .andWhere('userStock.filledPrice IS null')
-        // ;
 
         if (abbreviation !== undefined) {
             queryBuilder.andWhere('stock.abbreviation = :abbreviation', { abbreviation: abbreviation });
@@ -96,22 +77,15 @@ class UserStockService {
 
         let userStocks = [];
 
-        console.log(await queryBuilder.getSql());
-
         try {
             userStocks = await queryBuilder.getMany();
         } catch (error) {
-            console.log(error);
-
             return new GetAllResponse(
                 'UserStocks couldn\'t be found.',
                 null,
                 HttpCodes.HTTP_STATUS_BAD_REQUEST
             );
         }
-
-console.log(userStocks);
-return 'test';
 
         return new GetAllResponse(
             `UserStocks found for User ${username}${abbreviation ? ` for Stock $${abbreviation}.` : `.`}`,
