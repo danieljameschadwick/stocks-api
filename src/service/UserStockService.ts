@@ -11,7 +11,7 @@ import { UserStock } from '../entity/UserStock';
 import { UserStockDTO } from '../dto/UserStockDTO';
 import { UserBalance } from '../entity/UserBalance';
 import { UserRepository } from '../repository/UserRepository';
-import UserService from './UserService';
+import { UserService } from './UserService';
 
 class UserStockService {
     private userStockRepository: Repository<UserStock>;

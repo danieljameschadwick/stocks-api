@@ -33,7 +33,7 @@ class PlayerController {
 
     @Get('/:id')
     async get(@Req() request: Request, @Res() response: Response) {
-        const id = parseInt(request.params.id);
+        const id = parseInt(request.params.id, 10);
 
         if (id === undefined) {
             return new PlayerGetResponse(
@@ -60,7 +60,7 @@ class PlayerController {
 
     @Put('/:id')
     async update(@Req() request: Request, @Res() response: Response) {
-        const id = parseInt(request.params.id);
+        const id = parseInt(request.params.id, 10);
         const data = request.body;
         let team = null;
         let stock = null;
@@ -95,10 +95,8 @@ class PlayerController {
     }
 
     @Delete('/:id')
-    async delete(@Req() request, @Res() response) {
-        const id = parseInt(request.params.id);
-
-        return await this.playerService.delete(id);
+    async delete() {
+        return await this.playerService.delete();
     }
 }
 

@@ -1,26 +1,27 @@
-import UserController from './controller/UserController';
-
-import 'reflect-metadata';
 import { json } from 'express';
+import 'reflect-metadata';
 import { createConnection, getManager } from 'typeorm';
-import { graphqlHTTP } from 'express-graphql';
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { graphqlHTTP } from 'express-graphql'; // @TODO: debug as it is in dev deps
 import { Action, createExpressServer } from 'routing-controllers';
+import { buildSchema } from 'type-graphql';
+import { StockResolver } from './resolver/StockResolver';
+import CorsMiddleware from './middleware/CorsMiddleware';
+import { User } from './entity/User';
+import { UserService } from './service/UserService';
 import MainController from './controller/MainController';
+import UserController from './controller/UserController';
 import PlayerController from './controller/PlayerController';
 import TeamController from './controller/TeamController';
 import StockController from './controller/StockController';
 import UserStockController from './controller/UserStockController';
-import { StockResolver } from './resolver/StockResolver';
-import { buildSchema } from 'type-graphql';
-import CorsMiddleware from './middleware/CorsMiddleware';
-import { User } from './entity/User';
-import UserService from './service/UserService';
 
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
-const jwtStrategy = require('passport-jwt').Strategy;
-const extractJwt = require('passport-jwt').ExtractJwt;
-const jwt = require('jsonwebtoken');
+const JwtStrategy = require('passport-jwt').Strategy;
+// eslint-disable-next-line prefer-destructuring
+const ExtractJwt = require('passport-jwt').ExtractJwt;
+const Jwt = require('jsonwebtoken');
 
 createConnection().then(async () => {
     const app = createExpressServer({
@@ -38,22 +39,24 @@ createConnection().then(async () => {
             CorsMiddleware,
         ],
         authorizationChecker: (action: Action) => new Promise<boolean>((resolve, reject) => {
-            passport.authenticate('jwt', (err, user) => {
-                if (err) {
-                    return reject(err);
+            passport.authenticate('jwt', (error, user) => {
+                if (error) {
+                    return reject(error);
                 }
 
                 if (!user) {
                     return resolve(false);
                 }
 
-                action.request.user = user;
+                const { request } = action.request;
+                request.user = user;
+
                 return resolve(true);
             })(action.request, action.response, action.next);
         }),
         currentUserChecker: (action: Action) => action.request.user,
     });
-    const port = 4000;
+    const port = 4000; // @TODO: secrets?
 
     app.use(json());
 
@@ -89,23 +92,19 @@ createConnection().then(async () => {
                 return done(null, false, { message: 'Incorrect password.' });
             }
 
-            const payload = {
-                sub: user.id,
-            };
-
             return done(null, user);
         },
     ));
 
     const opts = {
-        jwtFromRequest: extractJwt.fromAuthHeaderAsBearerToken(),
-        secretOrKey: 'TOP_SECRET',
+        jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+        secretOrKey: 'TOP_SECRET', // @TODO: secrets?
     };
 
-    passport.use(new jwtStrategy(opts, (async (jwt_payload, done) => {
+    passport.use(new JwtStrategy(opts, (async (jwtPayload, done) => {
         const userRepository = getManager().getRepository(User);
 
-        const user = await userRepository.findOne({ id: jwt_payload.sub });
+        const user = await userRepository.findOne({ id: jwtPayload.sub });
 
         if (user) {
             return done(null, user);
@@ -124,28 +123,28 @@ createConnection().then(async () => {
         done(null, user);
     });
 
-    app.post('/login', passport.authenticate('local'), (req, res, next) => passport.authenticate('local', (err, user, info) => {
-        if (err) {
+    app.post('/login', passport.authenticate('local'), (request, response, next) => passport.authenticate('local', (error, user, info) => {
+        if (error) {
             return;
         }
 
         const body = { id: user.id, username: user.username };
-        const token = jwt.sign({ user: body }, 'TOP_SECRET');
+        const token = Jwt.sign({ user: body }, 'TOP_SECRET');
 
-        return res.json({
+        response.json({
             success: true,
             message: 'You have successfully logged in!',
             token,
             user,
             info,
         });
-    })(req, res, next));
+    })(request, response, next));
 
     passport.use(
-        new jwtStrategy(
+        new JwtStrategy(
             {
                 secretOrKey: 'TOP_SECRET',
-                jwtFromRequest: extractJwt.fromUrlQueryParameter('secret_token'),
+                jwtFromRequest: ExtractJwt.fromUrlQueryParameter('secret_token'),
             },
             async (token, done) => {
                 try {
@@ -158,11 +157,9 @@ createConnection().then(async () => {
     );
 
     app.post('/verify', passport.authenticate('jwt', { session: false }),
-        (req, res) => {
-            res.send({
-                verified: true,
-            });
-        });
+        (request, response) => response.send({
+            verified: true,
+        }));
 
     app.listen(port, () => {
         // eslint-disable-next-line no-console

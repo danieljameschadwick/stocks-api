@@ -2,7 +2,7 @@ import { json, Request, Response } from 'express';
 import {
     Controller, Delete, Get, Post, Put, Req, Res, UseBefore,
 } from 'routing-controllers';
-import UserService from '../service/UserService';
+import { UserService } from '../service/UserService';
 
 @Controller('/user')
 @UseBefore(json())
@@ -20,7 +20,7 @@ class UserController {
 
     @Get('/:id')
     async get(@Req() request: Request, @Res() response: Response) {
-        const id = parseInt(request.params.id);
+        const id = parseInt(request.params.id, 10);
 
         return await this.userService.get(id);
     }

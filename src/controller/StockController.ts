@@ -28,7 +28,7 @@ class StockController {
 
     @Get('/:id')
     async get(@Req() request: Request, @Res() response: Response) {
-        const id = parseInt(request.params.id);
+        const id = parseInt(request.params.id, 10);
 
         if (id === undefined) {
             return new StockGetResponse(
@@ -77,7 +77,7 @@ class StockController {
 
     @Put('/:id')
     async update(@Req() request: Request, @Res() response: Response) {
-        const id = parseInt(request.params.id);
+        const id = parseInt(request.params.id, 10);
         const data = request.body;
         let player = null;
 
@@ -106,10 +106,8 @@ class StockController {
     }
 
     @Delete('/:id')
-    async delete(@Req() request, @Res() response) {
-        const id = parseInt(request.params.id);
-
-        return await this.stockService.delete(id);
+    async delete() {
+        return await this.stockService.delete();
     }
 }
 

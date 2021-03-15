@@ -2,7 +2,7 @@ import { json, Request, Response } from 'express';
 import {
     Controller, Delete, Get, Post, Req, Res, UseBefore,
 } from 'routing-controllers';
-import UserService from '../service/UserService';
+import { UserService } from '../service/UserService';
 import UserStockService from '../service/UserStockService';
 import { UserStockDTO } from '../dto/UserStockDTO';
 
@@ -27,7 +27,7 @@ class UserStockController {
 
     @Get('/id/:id')
     async get(@Req() request: Request, @Res() response: Response) {
-        const id = parseInt(request.params.id);
+        const id = parseInt(request.params.id, 10);
 
         return await this.userStockService.get(id);
     }
@@ -49,7 +49,7 @@ class UserStockController {
     @Post('/sell/:id')
     async sell(@Req() request: Request, @Res() response: Response) {
         const username = request.params.username.toString();
-        const id = parseInt(request.params.id);
+        const id = parseInt(request.params.id, 10);
 
         return this.userStockService.sell(id, username);
     }

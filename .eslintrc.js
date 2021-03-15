@@ -1,3 +1,4 @@
+/* eslint-disable */
 module.exports = {
     env: {
         browser: true,
@@ -18,5 +19,7 @@ module.exports = {
         "indent": ["error", 4],
         "import/prefer-default-export": 0,
         "class-methods-use-this": 0,
+        "no-return-await": 0, // NodeJS best practice to return await
+        "no-unused-vars": 0, // @TODO: resolve type => on Entities
     },
 };

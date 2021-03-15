@@ -7,6 +7,7 @@ import { PlayerService } from '../service/PlayerService';
 import { TeamService } from '../service/TeamService';
 import { TeamGetResponse } from '../dto/response/team/TeamGetResponse';
 import { TeamDTO } from '../dto/TeamDTO';
+import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethodResponse';
 
 @Controller('/team')
 @UseBefore(json())
@@ -27,7 +28,7 @@ class TeamController {
 
     @Get('/:id')
     async get(@Req() request: Request, @Res() response: Response) {
-        const id = parseInt(request.params.id);
+        const id = parseInt(request.params.id, 10);
 
         if (id === undefined) {
             return new TeamGetResponse(
@@ -54,7 +55,7 @@ class TeamController {
 
     @Put('/:id')
     async update(@Req() request: Request, @Res() response: Response) {
-        const id = parseInt(request.params.id);
+        const id = parseInt(request.params.id, 10);
         const data = request.body;
 
         if (
@@ -77,10 +78,8 @@ class TeamController {
     }
 
     @Delete('/:id')
-    async delete(@Req() request, @Res() response) {
-        const id = parseInt(request.params.id);
-
-        return await this.teamService.delete(id);
+    async delete(): Promise<UnimplementedMethodResponse> {
+        return await this.teamService.delete();
     }
 }
 

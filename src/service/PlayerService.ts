@@ -169,7 +169,7 @@ export class PlayerService {
         );
     }
 
-    async delete(id: number): Promise<UnimplementedMethodResponse> {
+    async delete(): Promise<UnimplementedMethodResponse> {
         return new UnimplementedMethodResponse();
     }
 }

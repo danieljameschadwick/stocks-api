@@ -7,7 +7,6 @@ import {
 import { Field, ID, ObjectType } from 'type-graphql';
 import { Stock } from './Stock';
 import { User } from './User';
-import { StockHistory } from './StockHistory';
 
 @ObjectType()
 @Entity('tblUserStock')
@@ -19,7 +18,7 @@ export class UserStock extends BaseEntity {
     @Field((type) => User)
     @ManyToOne(() => User, (user) => user.stocks, {
         cascade: false,
-        // nullable: false,
+        // nullable: false, // @TODO: debug update partial hydration/update, e.g. UserStock
     })
     @JoinColumn({ name: 'intUserId' })
     user: User;

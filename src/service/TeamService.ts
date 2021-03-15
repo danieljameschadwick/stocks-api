@@ -97,7 +97,7 @@ export class TeamService {
         );
     }
 
-    async update(id: number, teamDTO: TeamDTO, options?: object): Promise<UpdateResponse> {
+    async update(id: number, teamDTO: TeamDTO): Promise<UpdateResponse> {
         let team = (await this.get(id)).data;
 
         if (team === undefined) {
@@ -150,7 +150,7 @@ export class TeamService {
         );
     }
 
-    async delete(id: number): Promise<UnimplementedMethodResponse> {
+    async delete(): Promise<UnimplementedMethodResponse> {
         return new UnimplementedMethodResponse();
     }
 }

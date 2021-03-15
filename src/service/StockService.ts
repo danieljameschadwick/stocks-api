@@ -9,7 +9,6 @@ import { StockUpdateResponse as UpdateResponse } from '../dto/response/stock/Sto
 import { StockDTO } from '../dto/StockDTO';
 import { ORM } from '../enum/Error';
 import { StockHistory } from '../entity/StockHistory';
-import { User } from '../entity/User';
 
 export class StockService {
     private stockRepository: Repository<Stock>;
@@ -149,7 +148,7 @@ export class StockService {
         );
     }
 
-    async update(id: number, stockDTO: StockDTO, options?: object): Promise<UpdateResponse> {
+    async update(id: number, stockDTO: StockDTO): Promise<UpdateResponse> {
         let updateResult;
         let getResult = await this.get(id);
         let stock = getResult.data;
@@ -214,7 +213,7 @@ export class StockService {
         );
     }
 
-    async delete(id: number): Promise<UnimplementedMethodResponse> {
+    async delete(): Promise<UnimplementedMethodResponse> {
         return new UnimplementedMethodResponse();
     }
 }

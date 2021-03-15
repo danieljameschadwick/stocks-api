@@ -1,4 +1,4 @@
-class NoEntityFound extends Error {
+export class NoEntityFound extends Error {
     constructor(props) {
         super(props);
 

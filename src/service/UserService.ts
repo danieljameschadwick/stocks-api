@@ -1,12 +1,10 @@
-import { getManager, Repository } from 'typeorm';
+import { getManager } from 'typeorm';
 import { constants as HttpCodes } from 'http2';
-import { TeamDTO } from '../dto/TeamDTO';
 import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethodResponse';
 import { UserGetResponse as GetResponse } from '../dto/response/user/UserGetResponse';
-import { UserDTO } from '../dto/UserDTO';
 import { UserRepository } from '../repository/UserRepository';
 
-class UserService {
+export class UserService {
     private userRepository: UserRepository;
 
     constructor() {
@@ -28,7 +26,7 @@ class UserService {
                 .getOneOrFail();
         } catch (error) {
             return new GetResponse(
-                `Error occured finding User [${id}]`,
+                `Error occurred finding User [${id}]`,
                 null,
                 HttpCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR,
             );
@@ -36,7 +34,7 @@ class UserService {
 
         if (user === undefined) {
             return new GetResponse(
-                `Couldn\'t find User [${id}]`,
+                `Couldn't find User [${id}]`,
                 null,
                 HttpCodes.HTTP_STATUS_NOT_FOUND,
             );
@@ -64,7 +62,7 @@ class UserService {
 
         if (user === undefined) {
             return new GetResponse(
-                `Couldn\'t find User [${username}]`,
+                `Couldn't find User [${username}]`,
                 null,
                 HttpCodes.HTTP_STATUS_NOT_FOUND,
             );
@@ -77,17 +75,15 @@ class UserService {
         );
     }
 
-    async create(teamDTO: TeamDTO): Promise<UnimplementedMethodResponse> {
+    async create(): Promise<UnimplementedMethodResponse> {
         return new UnimplementedMethodResponse();
     }
 
-    async update(id: number, userDTO: UserDTO, options?: object): Promise<UnimplementedMethodResponse> {
+    async update(): Promise<UnimplementedMethodResponse> {
         return new UnimplementedMethodResponse();
     }
 
-    async delete(id: number): Promise<UnimplementedMethodResponse> {
+    async delete(): Promise<UnimplementedMethodResponse> {
         return new UnimplementedMethodResponse();
     }
 }
-
-export default UserService;
