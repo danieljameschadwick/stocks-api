@@ -53,4 +53,9 @@ export class UserBalance extends BaseEntity {
         this.balance = balance ?? 0;
         this.created = dateTime ?? new Date();
     }
+
+    getBalance(): number
+    {
+        return Number(this.balance);
+    }
 }

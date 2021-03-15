@@ -245,10 +245,15 @@ class UserStockService {
 
         try {
             await getManager().transaction(async transactionalEntityManager => {
-                await this.userStockRepository.update(id, userStock);
+                const balance = userBalance.getBalance() + userStock.value();
 
-                const balance = userBalance.balance + userStock.value();
-                await this.userRepository.update(userBalance.id, { balance });
+                console.log(typeof userBalance.getBalance());
+                console.log(typeof userStock.value());
+
+                console.log(balance);
+
+                await transactionalEntityManager.update(UserStock, id, userStock);
+                await transactionalEntityManager.update(UserBalance, userBalance.id, { balance: balance });
             });
         } catch (error) {
             console.log(error);
