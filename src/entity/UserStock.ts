@@ -18,15 +18,19 @@ export class UserStock extends BaseEntity {
 
     @Field(type => User)
     @ManyToOne(() => User, user => user.stocks, {
-        cascade: false
+        cascade: false,
+        nullable: false,
     })
     @JoinColumn({ name: 'intUserId' })
 
     user: User;
 
     @Field(type => Stock)
-    @ManyToOne(() => Stock, stock => stock.userStocks)
-    @JoinColumn({ name: 'intStockId' })
+    @ManyToOne(() => Stock, stock => stock.userStocks, {
+        cascade: false,
+        nullable: false
+    })
+    @JoinColumn({ name: 'intStockId', })
     stock: Stock;
 
     @Field()

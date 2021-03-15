@@ -16,7 +16,8 @@ export class StockHistory extends BaseEntity {
 
     @Field(type => Stock)
     @ManyToOne(() => Stock, stock => stock.stockHistory, {
-        cascade: false
+        cascade: false,
+        nullable: false,
     })
     @JoinColumn({ name: 'intStockId' })
     stock: Stock;
