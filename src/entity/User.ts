@@ -16,7 +16,7 @@ import { UserBalance } from './UserBalance';
 @Unique(['username'])
 @Unique(['email'])
 export class User extends BaseEntity {
-    @Field(type => ID)
+    @Field((type) => ID)
     @PrimaryGeneratedColumn({ name: 'intUserId' })
     id?: number;
 
@@ -32,8 +32,8 @@ export class User extends BaseEntity {
     @Column({ name: 'strPassword' })
     password?: string;
 
-    @Field(type => UserBalance)
-    @OneToOne(() => UserBalance, userBalance => userBalance.user, {
+    @Field((type) => UserBalance)
+    @OneToOne(() => UserBalance, (userBalance) => userBalance.user, {
         cascade: true,
         nullable: true,
     })
@@ -42,8 +42,8 @@ export class User extends BaseEntity {
     })
     userBalance: UserBalance;
 
-    @Field(type => [UserStock])
-    @OneToMany(() => UserStock, userStock => userStock.user)
+    @Field((type) => [UserStock])
+    @OneToMany(() => UserStock, (userStock) => userStock.user)
     stocks: UserStock[];
 
     constructor(username: string, email: string, password?: string) {
@@ -55,8 +55,7 @@ export class User extends BaseEntity {
         this.userBalance = new UserBalance(this);
     }
 
-    balance(): number
-    {
+    balance(): number {
         return this.userBalance.balance;
     }
 }

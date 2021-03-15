@@ -1,5 +1,5 @@
-import { Stock } from '../entity/Stock';
 import { IsInt } from 'class-validator';
+import { Stock } from '../entity/Stock';
 
 export class StockHistoryDTO {
     stock: Stock;

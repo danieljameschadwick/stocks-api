@@ -1,5 +1,7 @@
 import { json, Request, Response } from 'express';
-import { Controller, Delete, Get, Post, Req, Res, UseBefore } from 'routing-controllers';
+import {
+    Controller, Delete, Get, Post, Req, Res, UseBefore,
+} from 'routing-controllers';
 import UserService from '../service/UserService';
 import UserStockService from '../service/UserStockService';
 import { UserStockDTO } from '../dto/UserStockDTO';
@@ -8,6 +10,7 @@ import { UserStockDTO } from '../dto/UserStockDTO';
 @UseBefore(json())
 class UserStockController {
     private userService: UserService;
+
     private userStockService: UserStockService;
 
     constructor() {
@@ -37,7 +40,7 @@ class UserStockController {
         const userStock = new UserStockDTO(
             username,
             stock.abbreviation,
-            quantity
+            quantity,
         );
 
         return await this.userStockService.buy(userStock);

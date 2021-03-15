@@ -1,17 +1,21 @@
 import { json, Request, Response } from 'express';
-import { Controller, Delete, Get, Post, Put, Req, Res, UseBefore } from 'routing-controllers';
+import {
+    Controller, Delete, Get, Post, Put, Req, Res, UseBefore,
+} from 'routing-controllers';
+import { constants as HttpCodes } from 'http2';
 import { PlayerService } from '../service/PlayerService';
 import { PlayerDTO } from '../dto/PlayerDTO';
 import { TeamService } from '../service/TeamService';
 import { PlayerGetResponse } from '../dto/response/player/PlayerGetResponse';
-import { constants as HttpCodes } from 'http2';
 import { StockService } from '../service/StockService';
 
 @Controller('/player')
 @UseBefore(json())
 class PlayerController {
     private playerService: PlayerService;
+
     private teamService: TeamService;
+
     private stockService: StockService;
 
     constructor() {
@@ -22,7 +26,7 @@ class PlayerController {
 
     @Get('/')
     async all(@Req() request: Request, @Res() response: Response) {
-        const ids = request.body.ids;
+        const { ids } = request.body;
 
         return await this.playerService.getAll(ids);
     }
@@ -35,7 +39,7 @@ class PlayerController {
             return new PlayerGetResponse(
                 'Couldn\'t find the ID in the request.',
                 {},
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
@@ -49,8 +53,8 @@ class PlayerController {
         return await this.playerService.create(
             new PlayerDTO(
                 data.firstName,
-                data.lastName
-            )
+                data.lastName,
+            ),
         );
     }
 
@@ -66,7 +70,7 @@ class PlayerController {
             && id === undefined
         ) {
             return response.send({
-                message: `No content sent.`,
+                message: 'No content sent.',
                 data: {},
             });
         }
@@ -85,8 +89,8 @@ class PlayerController {
                 data.firstName,
                 data.lastName,
                 team,
-                stock
-            )
+                stock,
+            ),
         );
     }
 

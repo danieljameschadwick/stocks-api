@@ -12,12 +12,12 @@ import { User } from './User';
 @ObjectType()
 @Entity('tblUserBalance')
 export class UserBalance extends BaseEntity {
-    @Field(type => ID)
+    @Field((type) => ID)
     @PrimaryGeneratedColumn({ name: 'intUserBalanceId' })
     id?: number;
 
-    @Field(type => User)
-    @OneToOne(() => User, user => user.userBalance, {
+    @Field((type) => User)
+    @OneToOne(() => User, (user) => user.userBalance, {
         cascade: false,
         // nullable: false,
     })
@@ -54,8 +54,7 @@ export class UserBalance extends BaseEntity {
         this.created = dateTime ?? new Date();
     }
 
-    getBalance(): number
-    {
+    getBalance(): number {
         return Number(this.balance);
     }
 }

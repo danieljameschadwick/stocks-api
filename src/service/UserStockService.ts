@@ -1,5 +1,6 @@
 import { getManager, Repository } from 'typeorm';
 import { constants as HttpCodes } from 'http2';
+import { formatStockName } from 'stocks-core/dist/lib/stock';
 import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethodResponse';
 import { Stock } from '../entity/Stock';
 import { UserStockBuyResponse as BuyResponse } from '../dto/response/userStock/UserStockBuyResponse';
@@ -8,16 +9,19 @@ import { UserStockGetResponse as GetResponse } from '../dto/response/userStock/U
 import { UserStockGetAllResponse as GetAllResponse } from '../dto/response/userStock/UserStockGetAllResponse';
 import { UserStock } from '../entity/UserStock';
 import { UserStockDTO } from '../dto/UserStockDTO';
-import { formatStockName } from 'stocks-core/dist/lib/stock';
 import { UserBalance } from '../entity/UserBalance';
 import { UserRepository } from '../repository/UserRepository';
 import UserService from './UserService';
 
 class UserStockService {
     private userStockRepository: Repository<UserStock>;
+
     private stockRepository: Repository<Stock>;
+
     private userRepository: UserRepository;
+
     private userBalanceRepository: Repository<UserBalance>;
+
     private userService: UserService;
 
     constructor() {
@@ -29,7 +33,7 @@ class UserStockService {
     }
 
     async get(id: number): Promise<GetResponse> {
-        let userStock = undefined;
+        let userStock;
 
         const queryBuilder = this.userStockRepository.createQueryBuilder('userStock')
             .select([
@@ -40,16 +44,14 @@ class UserStockService {
             .innerJoin('userStock.stock', 'stock')
             .innerJoin('userStock.user', 'user')
             .andWhere('userStock.id = :id', { id })
-            .andWhere('userStock.filledPrice IS null')
-        ;
-
+            .andWhere('userStock.filledPrice IS null');
         try {
             userStock = await queryBuilder.getOneOrFail();
         } catch (error) {
             return new GetResponse(
                 `There was a server error finding UserStock [${id}].`,
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
@@ -57,7 +59,7 @@ class UserStockService {
             return new GetResponse(
                 `UserStock [${id}] not found.`,
                 null,
-                HttpCodes.HTTP_STATUS_NOT_FOUND
+                HttpCodes.HTTP_STATUS_NOT_FOUND,
             );
         }
 
@@ -67,14 +69,14 @@ class UserStockService {
             return new GetResponse(
                 `UserStock [${id}] was found, but User or Stock was undefined.`,
                 null,
-                HttpCodes.HTTP_STATUS_NOT_FOUND
+                HttpCodes.HTTP_STATUS_NOT_FOUND,
             );
         }
 
         return new GetResponse(
-            `UserStock found by ID [${id}] ${stock.abbreviation ? `for Stock $${stock.abbreviation}.` : `.`}`,
+            `UserStock found by ID [${id}] ${stock.abbreviation ? `for Stock $${stock.abbreviation}.` : '.'}`,
             userStock,
-            HttpCodes.HTTP_STATUS_OK
+            HttpCodes.HTTP_STATUS_OK,
         );
     }
 
@@ -85,23 +87,21 @@ class UserStockService {
             return new GetAllResponse(
                 'User must be set.',
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
         const queryBuilder = this.userStockRepository.createQueryBuilder('userStock')
             .select([
                 'userStock',
-                'stock'
+                'stock',
             ])
             .innerJoin('userStock.stock', 'stock')
             .leftJoin('userStock.user', 'user')
-            .andWhere('user.username = :username', { username: username })
-            .andWhere('userStock.filledPrice IS null')
-        ;
-
+            .andWhere('user.username = :username', { username })
+            .andWhere('userStock.filledPrice IS null');
         if (abbreviation !== undefined) {
-            queryBuilder.andWhere('stock.abbreviation = :abbreviation', { abbreviation: abbreviation });
+            queryBuilder.andWhere('stock.abbreviation = :abbreviation', { abbreviation });
         }
 
         let userStocks = [];
@@ -112,14 +112,14 @@ class UserStockService {
             return new GetAllResponse(
                 'UserStocks couldn\'t be found.',
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
         return new GetAllResponse(
-            `UserStocks found for User ${username}${abbreviation ? ` for Stock $${abbreviation}.` : `.`}`,
+            `UserStocks found for User ${username}${abbreviation ? ` for Stock $${abbreviation}.` : '.'}`,
             userStocks,
-            HttpCodes.HTTP_STATUS_OK
+            HttpCodes.HTTP_STATUS_OK,
         );
     }
 
@@ -127,7 +127,7 @@ class UserStockService {
         const { username, abbreviation, quantity } = userStockDTO;
 
         const user = await this.userRepository.getOneByUsername(username);
-        const stock = await this.stockRepository.findOne({ abbreviation: abbreviation });
+        const stock = await this.stockRepository.findOne({ abbreviation });
 
         if (
             user === undefined
@@ -136,15 +136,15 @@ class UserStockService {
             return new BuyResponse(
                 `Couldn't find User [${username}] or Stock [${abbreviation}].`,
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
-        if (null === stock.price) {
+        if (stock.price === null) {
             return new BuyResponse(
                 `No price set on Stock [${abbreviation}].`,
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
@@ -155,14 +155,14 @@ class UserStockService {
             return new BuyResponse(
                 `User ${user.username} [${user.id}] doesn't have enough funds.`,
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
-        let userStock = undefined;
+        let userStock;
 
         try {
-            await getManager().transaction(async transactionalEntityManager => {
+            await getManager().transaction(async (transactionalEntityManager) => {
                 userStock = new UserStock(
                     user,
                     stock,
@@ -170,10 +170,10 @@ class UserStockService {
                     quantity,
                 );
 
-                userStock = await this.userStockRepository.save(userStock);
+                userStock = await transactionalEntityManager.save(userStock);
 
-                userBalance.balance = userBalance.balance - orderTotal;
-                await this.userBalanceRepository.update(userBalance.id, userBalance);
+                userBalance.balance -= orderTotal;
+                await transactionalEntityManager.update(UserBalance, userBalance.id, userBalance);
             });
         } catch (error) {
             return new BuyResponse(
@@ -199,12 +199,11 @@ class UserStockService {
     }
 
     async sell(id: number, username: string): Promise<SellResponse> {
-        let getResponse = undefined;
+        let getResponse;
 
         try {
             getResponse = await this.get(id);
         } catch (error) {
-            console.log(error);
             return new SellResponse(
                 `Unknown error whilst retrieving UserStock [${id}].`,
                 null,
@@ -237,27 +236,16 @@ class UserStockService {
         }
 
         userStock.sell();
-
         const { userBalance } = user;
 
-        console.log(user);
-        console.log(userBalance);
-
         try {
-            await getManager().transaction(async transactionalEntityManager => {
+            await getManager().transaction(async (transactionalEntityManager) => {
                 const balance = userBalance.getBalance() + userStock.value();
 
-                console.log(typeof userBalance.getBalance());
-                console.log(typeof userStock.value());
-
-                console.log(balance);
-
                 await transactionalEntityManager.update(UserStock, id, userStock);
-                await transactionalEntityManager.update(UserBalance, userBalance.id, { balance: balance });
+                await transactionalEntityManager.update(UserBalance, userBalance.id, { balance });
             });
         } catch (error) {
-            console.log(error);
-
             return new SellResponse(
                 `Unknown error whilst saving UserStock [${id}].`,
                 null,
@@ -272,6 +260,7 @@ class UserStockService {
         );
     }
 
+    // eslint-disable-next-line no-unused-vars
     async delete(id: number): Promise<UnimplementedMethodResponse> {
         return new UnimplementedMethodResponse();
     }

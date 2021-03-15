@@ -1,11 +1,5 @@
 import UserController from './controller/UserController';
 
-const passport = require('passport');
-const LocalStrategy = require('passport-local').Strategy;
-const jwtStrategy = require('passport-jwt').Strategy;
-const extractJwt = require('passport-jwt').ExtractJwt;
-const jwt = require('jsonwebtoken');
-
 import 'reflect-metadata';
 import { json } from 'express';
 import { createConnection, getManager } from 'typeorm';
@@ -21,6 +15,12 @@ import { buildSchema } from 'type-graphql';
 import CorsMiddleware from './middleware/CorsMiddleware';
 import { User } from './entity/User';
 import UserService from './service/UserService';
+
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const jwtStrategy = require('passport-jwt').Strategy;
+const extractJwt = require('passport-jwt').ExtractJwt;
+const jwt = require('jsonwebtoken');
 
 createConnection().then(async () => {
     const app = createExpressServer({
@@ -66,8 +66,8 @@ createConnection().then(async () => {
     app.use(
         '/graphql',
         graphqlHTTP({
-            schema: schema,
-            graphiql: true
+            schema,
+            graphiql: true,
         }),
     );
 
@@ -75,7 +75,7 @@ createConnection().then(async () => {
     app.use(passport.session());
 
     passport.use(new LocalStrategy(
-        async function (username, password, done) {
+        async (username, password, done) => {
             const userService = new UserService();
 
             const userResponse = await userService.getByUsername(username);
@@ -90,11 +90,11 @@ createConnection().then(async () => {
             }
 
             const payload = {
-                sub: user.id
+                sub: user.id,
             };
 
             return done(null, user);
-        }
+        },
     ));
 
     const opts = {
@@ -102,53 +102,50 @@ createConnection().then(async () => {
         secretOrKey: 'TOP_SECRET',
     };
 
-    passport.use(new jwtStrategy(opts, async function (jwt_payload, done) {
+    passport.use(new jwtStrategy(opts, (async (jwt_payload, done) => {
         const userRepository = getManager().getRepository(User);
 
         const user = await userRepository.findOne({ id: jwt_payload.sub });
 
         if (user) {
             return done(null, user);
-        } else {
-            return done(null, false);
         }
-    }));
+        return done(null, false);
+    })));
 
-    passport.serializeUser(function (user, done) {
+    passport.serializeUser((user, done) => {
         done(null, user.id);
     });
 
-    passport.deserializeUser(async function (id, done) {
+    passport.deserializeUser(async (id, done) => {
         const userRepository = getManager().getRepository(User);
-        const user = await userRepository.findOne({ id: id });
+        const user = await userRepository.findOne({ id });
 
         done(null, user);
     });
 
-    app.post('/login', passport.authenticate('local'), function (req, res, next) {
-        return passport.authenticate('local', (err, user, info) => {
-            if (err) {
-                return;
-            }
+    app.post('/login', passport.authenticate('local'), (req, res, next) => passport.authenticate('local', (err, user, info) => {
+        if (err) {
+            return;
+        }
 
-            const body = { id: user.id, username: user.username };
-            const token = jwt.sign({ user: body }, 'TOP_SECRET');
+        const body = { id: user.id, username: user.username };
+        const token = jwt.sign({ user: body }, 'TOP_SECRET');
 
-            return res.json({
-                success: true,
-                message: 'You have successfully logged in!',
-                token,
-                user: user,
-                info: info
-            });
-        })(req, res, next);
-    });
+        return res.json({
+            success: true,
+            message: 'You have successfully logged in!',
+            token,
+            user,
+            info,
+        });
+    })(req, res, next));
 
     passport.use(
         new jwtStrategy(
             {
                 secretOrKey: 'TOP_SECRET',
-                jwtFromRequest: extractJwt.fromUrlQueryParameter('secret_token')
+                jwtFromRequest: extractJwt.fromUrlQueryParameter('secret_token'),
             },
             async (token, done) => {
                 try {
@@ -156,19 +153,19 @@ createConnection().then(async () => {
                 } catch (error) {
                     return done(null, { verified: false });
                 }
-            }
-        )
+            },
+        ),
     );
 
-    app.post('/verify', passport.authenticate('jwt', { 'session': false }),
-        function (req, res) {
+    app.post('/verify', passport.authenticate('jwt', { session: false }),
+        (req, res) => {
             res.send({
-                'verified': true,
+                verified: true,
             });
-        }
-    );
+        });
 
     app.listen(port, () => {
+        // eslint-disable-next-line no-console
         console.log(`App listening at http://localhost:${port}`);
     });
 });

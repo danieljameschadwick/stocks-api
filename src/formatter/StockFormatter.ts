@@ -17,7 +17,7 @@ export class StockFormatter {
             direction: trendDirection,
             symbol: this.formatTrendSymbol(trendDirection),
             percentage: this.formatPercentage(
-                this.calculateStockPercentage(soonestStock.price, latestStock.price)
+                this.calculateStockPercentage(soonestStock.price, latestStock.price),
             ),
         };
     }
@@ -33,7 +33,7 @@ export class StockFormatter {
     }
 
     static calculateStockPercentage(soonestPrice: number, latestPrice: number): number {
-        return ((soonestPrice - latestPrice) / latestPrice) * 100
+        return ((soonestPrice - latestPrice) / latestPrice) * 100;
     }
 
     static formatPercentage(percentage: number): number {

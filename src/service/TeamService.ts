@@ -1,7 +1,7 @@
 import { getManager, Repository } from 'typeorm';
+import { constants as HttpCodes } from 'http2';
 import { Team } from '../entity/Team';
 import { TeamGetResponse as GetResponse } from '../dto/response/team/TeamGetResponse';
-import { constants as HttpCodes } from 'http2';
 import { ORM } from '../enum/Error';
 import { TeamDTO } from '../dto/TeamDTO';
 import { TeamGetAllResponse as GetAllResponse } from '../dto/response/team/TeamGetAllResponse';
@@ -25,19 +25,19 @@ export class TeamService {
             return new GetAllResponse(
                 'Something went wrong when talking to the ORM.',
                 [],
-                HttpCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR
+                HttpCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR,
             );
         }
 
         return new GetAllResponse(
             '',
             teams,
-            HttpCodes.HTTP_STATUS_OK
+            HttpCodes.HTTP_STATUS_OK,
         );
     }
 
     async get(id: number): Promise<GetResponse> {
-        let team = undefined;
+        let team;
 
         try {
             team = await this.teamRepository.findOne(id, { relations: ['players'] });
@@ -45,7 +45,7 @@ export class TeamService {
             return new GetResponse(
                 `Unknown whilst finding Team [${id}].`,
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
@@ -53,24 +53,24 @@ export class TeamService {
             return new GetResponse(
                 `Team [${id}] could not be found.`,
                 null,
-                HttpCodes.HTTP_STATUS_NOT_FOUND
+                HttpCodes.HTTP_STATUS_NOT_FOUND,
             );
         }
 
         return new GetResponse(
             `Team ${team.name} [${team.id}] found.`,
             team,
-            HttpCodes.HTTP_STATUS_OK
+            HttpCodes.HTTP_STATUS_OK,
         );
     }
 
     async create(teamDTO: TeamDTO): Promise<CreateResponse> {
         const teamModel = new Team(
             teamDTO.name,
-            teamDTO.abbreviation
+            teamDTO.abbreviation,
         );
 
-        let team = undefined;
+        let team;
 
         try {
             team = await this.teamRepository.save(teamModel);
@@ -79,21 +79,21 @@ export class TeamService {
                 return new CreateResponse(
                     `Team ${teamModel.name}, ${teamModel.abbreviation} already exists.`,
                     null,
-                    HttpCodes.HTTP_STATUS_FOUND
+                    HttpCodes.HTTP_STATUS_FOUND,
                 );
             }
 
             return new CreateResponse(
                 'Unknown error whilst saving Team.',
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
         return new CreateResponse(
             `Team ${team.name} [${team.id}] created.`,
             null,
-            HttpCodes.HTTP_STATUS_CREATED
+            HttpCodes.HTTP_STATUS_CREATED,
         );
     }
 
@@ -104,13 +104,13 @@ export class TeamService {
             return new UpdateResponse(
                 `Unknown Team [${id}].`,
                 null,
-                HttpCodes.HTTP_STATUS_NOT_FOUND
+                HttpCodes.HTTP_STATUS_NOT_FOUND,
             );
         }
 
         const teamModel = new Team(
             teamDTO.name,
-            teamDTO.abbreviation
+            teamDTO.abbreviation,
         );
 
         let updateResult = null;
@@ -122,14 +122,14 @@ export class TeamService {
                 return new CreateResponse(
                     `Team ${teamModel.name}, ${teamModel.abbreviation} already exists. Team [${id}] wasn't updated.`,
                     null,
-                    HttpCodes.HTTP_STATUS_FOUND
+                    HttpCodes.HTTP_STATUS_FOUND,
                 );
             }
 
             return new CreateResponse(
                 `Unknown error whilst saving Team ${teamModel.name}.`,
                 null,
-                HttpCodes.HTTP_STATUS_FOUND
+                HttpCodes.HTTP_STATUS_FOUND,
             );
         }
 
@@ -137,7 +137,7 @@ export class TeamService {
             return new UpdateResponse(
                 `Team with name ${teamModel.name} [${id}] was not updated.`,
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
@@ -146,7 +146,7 @@ export class TeamService {
         return new UpdateResponse(
             `Team ${team.name} [${team.id}] updated.`,
             null,
-            HttpCodes.HTTP_STATUS_BAD_REQUEST
+            HttpCodes.HTTP_STATUS_BAD_REQUEST,
         );
     }
 

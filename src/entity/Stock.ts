@@ -3,16 +3,16 @@ import {
     Column,
     PrimaryGeneratedColumn, BaseEntity, OneToOne, JoinColumn, OneToMany,
 } from 'typeorm';
+import { Field, ID, ObjectType } from 'type-graphql';
 import { Player } from './Player';
 import { StockDTO } from '../dto/StockDTO';
 import { StockHistory } from './StockHistory';
-import { Field, ID, ObjectType } from 'type-graphql';
 import { UserStock } from './UserStock';
 
 @ObjectType()
 @Entity('tblStock')
 export class Stock extends BaseEntity {
-    @Field(type => ID)
+    @Field((type) => ID)
     @PrimaryGeneratedColumn({ name: 'intStockId' })
     id?: number;
 
@@ -20,16 +20,16 @@ export class Stock extends BaseEntity {
     @Column({ name: 'strAbbreviation' })
     abbreviation: string;
 
-    @Field(type => Player)
-    @OneToOne(() => Player, player => player.stock, {
-        cascade: false
+    @Field((type) => Player)
+    @OneToOne(() => Player, (player) => player.stock, {
+        cascade: false,
     })
     @JoinColumn({ name: 'intPlayerId' })
     player: Player;
 
-    @Field(type => [StockHistory])
-    @OneToMany(() => StockHistory, stockHistory => stockHistory.stock, {
-        cascade: false
+    @Field((type) => [StockHistory])
+    @OneToMany(() => StockHistory, (stockHistory) => stockHistory.stock, {
+        cascade: false,
     })
     stockHistory: StockHistory[];
 
@@ -39,7 +39,7 @@ export class Stock extends BaseEntity {
         type: 'decimal',
         precision: 10,
         scale: 2,
-        nullable: true
+        nullable: true,
     })
     price?: number;
 
@@ -47,9 +47,9 @@ export class Stock extends BaseEntity {
     @Column({ name: 'dtmUpdatedDate' })
     updatedDate: Date;
 
-    @Field(type => [UserStock])
-    @OneToMany(() => UserStock, stock => stock.stock, {
-        cascade: false
+    @Field((type) => [UserStock])
+    @OneToMany(() => UserStock, (stock) => stock.stock, {
+        cascade: false,
     })
     userStocks: UserStock[];
 

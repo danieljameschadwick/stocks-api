@@ -1,8 +1,8 @@
 import { getManager, In, Repository } from 'typeorm';
+import { constants as HttpCodes } from 'http2';
 import { Player } from '../entity/Player';
 import { PlayerDTO } from '../dto/PlayerDTO';
 import { ORM } from '../enum/Error';
-import { constants as HttpCodes } from 'http2';
 import { Team } from '../entity/Team';
 import { PlayerGetResponse as GetResponse } from '../dto/response/player/PlayerGetResponse';
 import { PlayerCreateResponse as CreateResponse } from '../dto/response/player/PlayerCreateResponse';
@@ -12,6 +12,7 @@ import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethod
 
 export class PlayerService {
     private playerRepository: Repository<Player>;
+
     private teamRepository: Repository<Team>;
 
     constructor() {
@@ -28,7 +29,7 @@ export class PlayerService {
             && ids.length > 0
         ) {
             options = {
-                'id': In(ids),
+                id: In(ids),
             };
         }
 
@@ -38,29 +39,29 @@ export class PlayerService {
             return new PlayerGetAllResponse(
                 'Something went wrong when talking to the ORM.',
                 [],
-                HttpCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR
+                HttpCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR,
             );
         }
 
         return new PlayerGetAllResponse(
             '',
             players,
-            HttpCodes.HTTP_STATUS_OK
+            HttpCodes.HTTP_STATUS_OK,
         );
     }
 
     async get(id: number): Promise<GetResponse> {
-        let player = undefined;
+        let player;
 
         try {
             player = await this.playerRepository.findOne(id, {
-                relations: ['team', 'stock']
+                relations: ['team', 'stock'],
             });
         } catch (error) {
             return new GetResponse(
                 `Error finding Player [${id}].`,
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
@@ -68,29 +69,29 @@ export class PlayerService {
             return new GetResponse(
                 `Player [${id}] could not be found.`,
                 null,
-                HttpCodes.HTTP_STATUS_NOT_FOUND
+                HttpCodes.HTTP_STATUS_NOT_FOUND,
             );
         }
 
         return new GetResponse(
             `Player [${player.id}] found.`,
             player,
-            HttpCodes.HTTP_STATUS_OK
+            HttpCodes.HTTP_STATUS_OK,
         );
     }
 
     async create(playerDTO: PlayerDTO): Promise<CreateResponse> {
         const playerModel = new Player(
             playerDTO.firstName,
-            playerDTO.lastName
+            playerDTO.lastName,
         );
 
         if (playerDTO.team !== null) {
-            // player.team = playerDTO.team;
-            // this.teamService.get(playerDTO.team);
+        // player.team = playerDTO.team;
+        // this.teamService.get(playerDTO.team);
         }
 
-        let player = undefined;
+        let player;
 
         try {
             player = await this.playerRepository.save(playerModel);
@@ -99,34 +100,34 @@ export class PlayerService {
                 return new CreateResponse(
                     `Player ${playerModel.fullName} already exists`,
                     null,
-                    HttpCodes.HTTP_STATUS_FOUND
+                    HttpCodes.HTTP_STATUS_FOUND,
                 );
             }
 
             return new CreateResponse(
                 `Unknown error whilst saving Player ${playerModel.fullName}.`,
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
         return new CreateResponse(
             `Player [${player.id}] created.`,
             null,
-            HttpCodes.HTTP_STATUS_CREATED
+            HttpCodes.HTTP_STATUS_CREATED,
         );
     }
 
     async update(id: number, playerDTO: PlayerDTO): Promise<UpdateResponse> {
-        let updateResult = undefined;
-        let getResult = await this.get(id);
+        let updateResult;
+        const getResult = await this.get(id);
         let player = getResult.data;
 
         if (getResult.code !== HttpCodes.HTTP_STATUS_OK) {
             return new UpdateResponse(
                 `Could not find Player ${id}.`,
                 getResult,
-                HttpCodes.HTTP_STATUS_FOUND
+                HttpCodes.HTTP_STATUS_FOUND,
             );
         }
 
@@ -139,14 +140,14 @@ export class PlayerService {
                 return new UpdateResponse(
                     `Player ${player.fullName} already exists. Player [${id}] wasn't updated.`,
                     null,
-                    HttpCodes.HTTP_STATUS_FOUND
+                    HttpCodes.HTTP_STATUS_FOUND,
                 );
             }
 
             return new UpdateResponse(
                 `Unknown error whilst saving Player ${player.fullName}.`,
                 null,
-                HttpCodes.HTTP_STATUS_FOUND
+                HttpCodes.HTTP_STATUS_FOUND,
             );
         }
 
@@ -154,7 +155,7 @@ export class PlayerService {
             return new UpdateResponse(
                 `Player with name ${player.fullName} [${id}] was not updated.`,
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
@@ -164,7 +165,7 @@ export class PlayerService {
         return new UpdateResponse(
             `Player with ${player.id} of ${player.fullName} updated.`,
             player,
-            HttpCodes.HTTP_STATUS_BAD_REQUEST
+            HttpCodes.HTTP_STATUS_BAD_REQUEST,
         );
     }
 

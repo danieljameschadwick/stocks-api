@@ -12,22 +12,22 @@ import { StockHistory } from './StockHistory';
 @ObjectType()
 @Entity('tblUserStock')
 export class UserStock extends BaseEntity {
-    @Field(type => ID)
+    @Field((type) => ID)
     @PrimaryGeneratedColumn({ name: 'intUserStockId' })
     id?: number;
 
-    @Field(type => User)
-    @ManyToOne(() => User, user => user.stocks, {
+    @Field((type) => User)
+    @ManyToOne(() => User, (user) => user.stocks, {
         cascade: false,
         // nullable: false,
     })
     @JoinColumn({ name: 'intUserId' })
     user: User;
 
-    @Field(type => Stock)
-    @ManyToOne(() => Stock, stock => stock.userStocks, {
+    @Field((type) => Stock)
+    @ManyToOne(() => Stock, (stock) => stock.userStocks, {
         cascade: false,
-        nullable: false
+        nullable: false,
     })
     @JoinColumn({ name: 'intStockId' })
     stock: Stock;
@@ -75,18 +75,15 @@ export class UserStock extends BaseEntity {
         this.dateTime = dateTime ?? new Date();
     }
 
-    sell(): void
-    {
+    sell(): void {
         this.filledPrice = this.stock.price;
     }
 
-    isSold(): boolean
-    {
+    isSold(): boolean {
         return this.filledPrice !== null;
     }
 
-    value(): number
-    {
+    value(): number {
         if (this.isSold()) {
             return this.filledPrice * this.quantity;
         }

@@ -1,6 +1,8 @@
 export class AbstractResponse {
     message: string;
+
     data?: any;
+
     code: number;
 
     constructor(message: string, data?: any, code: number = 200) {

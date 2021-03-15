@@ -7,16 +7,16 @@ import {
     BaseEntity,
     OneToOne, JoinColumn,
 } from 'typeorm';
+import { Field, ID, ObjectType } from 'type-graphql';
 import { Team } from './Team';
 import { Stock } from './Stock';
 import { PlayerDTO } from '../dto/PlayerDTO';
-import { Field, ID, ObjectType } from 'type-graphql';
 
 @ObjectType()
 @Entity('tblPlayer')
 @Unique(['firstName', 'lastName'])
 export class Player extends BaseEntity {
-    @Field(type => ID)
+    @Field((type) => ID)
     @PrimaryGeneratedColumn({ name: 'intPlayerId' })
     id?: number;
 
@@ -28,15 +28,15 @@ export class Player extends BaseEntity {
     @Column({ name: 'strLastName' })
     lastName: string;
 
-    @Field(type => Team)
-    @ManyToOne(() => Team, team => team.players, {
-        nullable: true
+    @Field((type) => Team)
+    @ManyToOne(() => Team, (team) => team.players, {
+        nullable: true,
     })
     @JoinColumn({ name: 'intTeamId' })
     team?: Team;
 
-    @Field(type => Stock)
-    @OneToOne(() => Stock, stock => stock.player, {
+    @Field((type) => Stock)
+    @OneToOne(() => Stock, (stock) => stock.player, {
         cascade: true,
         nullable: true,
     })
@@ -67,5 +67,5 @@ export class Player extends BaseEntity {
 
     get fullName(): string {
         return `${(this.firstName)} ${(this.lastName)}`;
-    };
+    }
 }

@@ -1,8 +1,10 @@
 import { json, Request, Response } from 'express';
-import { Controller, Delete, Get, Post, Put, Req, Res, UseBefore } from 'routing-controllers';
+import {
+    Controller, Delete, Get, Post, Put, Req, Res, UseBefore,
+} from 'routing-controllers';
+import { constants as HttpCodes } from 'http2';
 import { PlayerService } from '../service/PlayerService';
 import { TeamService } from '../service/TeamService';
-import { constants as HttpCodes } from 'http2';
 import { TeamGetResponse } from '../dto/response/team/TeamGetResponse';
 import { TeamDTO } from '../dto/TeamDTO';
 
@@ -10,6 +12,7 @@ import { TeamDTO } from '../dto/TeamDTO';
 @UseBefore(json())
 class TeamController {
     private playerService: PlayerService;
+
     private teamService: TeamService;
 
     constructor() {
@@ -30,7 +33,7 @@ class TeamController {
             return new TeamGetResponse(
                 'Couldn\'t find the ID in the request.',
                 {},
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
@@ -44,8 +47,8 @@ class TeamController {
         return await this.teamService.create(
             new TeamDTO(
                 data.name,
-                data.abbreviation
-            )
+                data.abbreviation,
+            ),
         );
     }
 
@@ -59,7 +62,7 @@ class TeamController {
             && id === undefined
         ) {
             return response.send({
-                message: `No content sent.`,
+                message: 'No content sent.',
                 data: {},
             });
         }
@@ -68,8 +71,8 @@ class TeamController {
             id,
             new TeamDTO(
                 data.name,
-                data.abbreviation
-            )
+                data.abbreviation,
+            ),
         );
     }
 

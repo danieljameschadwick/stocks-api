@@ -3,19 +3,19 @@ import {
     Column,
     PrimaryGeneratedColumn, BaseEntity, JoinColumn, ManyToOne, AfterLoad,
 } from 'typeorm';
+import { Field, ID, ObjectType } from 'type-graphql';
 import { Stock } from './Stock';
 import { StockHistoryDTO } from '../dto/StockHistoryDTO';
-import { Field, ID, ObjectType } from 'type-graphql';
 
 @ObjectType()
 @Entity('tblStockHistory')
 export class StockHistory extends BaseEntity {
-    @Field(type => ID)
+    @Field((type) => ID)
     @PrimaryGeneratedColumn({ name: 'intStockHistoryId' })
     id?: number;
 
-    @Field(type => Stock)
-    @ManyToOne(() => Stock, stock => stock.stockHistory, {
+    @Field((type) => Stock)
+    @ManyToOne(() => Stock, (stock) => stock.stockHistory, {
         cascade: false,
         nullable: false,
     })

@@ -1,5 +1,7 @@
 import { json, Request, Response } from 'express';
-import { Controller, Get, Req, Res, UseBefore } from 'routing-controllers';
+import {
+    Controller, Get, Req, Res, UseBefore,
+} from 'routing-controllers';
 
 @Controller()
 @UseBefore(json())
@@ -8,7 +10,7 @@ class MainController {
     get(@Req() request: Request, @Res() response: Response) {
         return response.send({
             healthCheck: true,
-            statusCode: 200
+            statusCode: 200,
         });
     }
 }

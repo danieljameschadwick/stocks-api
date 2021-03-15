@@ -1,6 +1,6 @@
 import { Arg, Query, Resolver } from 'type-graphql';
-import { Stock } from '../entity/Stock';
 import { getManager, Repository } from 'typeorm';
+import { Stock } from '../entity/Stock';
 
 @Resolver()
 export class StockResolver {

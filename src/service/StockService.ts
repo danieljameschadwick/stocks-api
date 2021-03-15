@@ -27,19 +27,19 @@ export class StockService {
             return new GetAllResponse(
                 'Something went wrong when talking to the ORM.',
                 [],
-                HttpCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR
+                HttpCodes.HTTP_STATUS_INTERNAL_SERVER_ERROR,
             );
         }
 
         return new GetAllResponse(
             '',
             stocks,
-            HttpCodes.HTTP_STATUS_OK
+            HttpCodes.HTTP_STATUS_OK,
         );
     }
 
     async get(id: number): Promise<GetResponse> {
-        let stock = undefined;
+        let stock;
 
         try {
             stock = await this.stockRepository.createQueryBuilder('stock')
@@ -56,7 +56,7 @@ export class StockService {
             return new GetResponse(
                 `Unknown whilst finding Stock [${id}].`,
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
@@ -67,14 +67,14 @@ export class StockService {
             return new GetResponse(
                 `Stock [${id}] could not found.`,
                 null,
-                HttpCodes.HTTP_STATUS_NOT_FOUND
+                HttpCodes.HTTP_STATUS_NOT_FOUND,
             );
         }
 
         return new GetResponse(
             `Stock ${stock.abbreviation} [${stock.id}] found.`,
             stock,
-            HttpCodes.HTTP_STATUS_OK
+            HttpCodes.HTTP_STATUS_OK,
         );
     }
 
@@ -90,13 +90,13 @@ export class StockService {
                 .orderBy({
                     'stockHistory.dateTime': 'ASC',
                 })
-                .where('stock.abbreviation = :abbreviation', { abbreviation: abbreviation })
+                .where('stock.abbreviation = :abbreviation', { abbreviation })
                 .getOne();
         } catch (error) {
             return new GetResponse(
                 `Unknown whilst finding Stock [${abbreviation}].`,
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
@@ -104,14 +104,14 @@ export class StockService {
             return new GetResponse(
                 `Stock [${abbreviation}] could not found.`,
                 null,
-                HttpCodes.HTTP_STATUS_NOT_FOUND
+                HttpCodes.HTTP_STATUS_NOT_FOUND,
             );
         }
 
         return new GetResponse(
             `Stock ${stock.abbreviation} [${stock.id}] found.`,
             stock,
-            HttpCodes.HTTP_STATUS_OK
+            HttpCodes.HTTP_STATUS_OK,
         );
     }
 
@@ -119,10 +119,10 @@ export class StockService {
         const stockModel = new Stock(
             stockDTO.abbreviation,
             stockDTO.player,
-            stockDTO.price
+            stockDTO.price,
         );
 
-        let stock = undefined;
+        let stock;
 
         try {
             stock = await this.stockRepository.save(stockModel);
@@ -131,26 +131,26 @@ export class StockService {
                 return new CreateResponse(
                     `Stock ${stockModel.abbreviation} [${stockModel.id}] already exists`,
                     null,
-                    HttpCodes.HTTP_STATUS_FOUND
+                    HttpCodes.HTTP_STATUS_FOUND,
                 );
             }
 
             return new CreateResponse(
                 `Unknown error whilst saving Stock ${stockModel.abbreviation}.`,
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
         return new CreateResponse(
             `Stock ${stock.abbreviation} [${stock.id}] created.`,
             null,
-            HttpCodes.HTTP_STATUS_CREATED
+            HttpCodes.HTTP_STATUS_CREATED,
         );
     }
 
     async update(id: number, stockDTO: StockDTO, options?: object): Promise<UpdateResponse> {
-        let updateResult = undefined;
+        let updateResult;
         let getResult = await this.get(id);
         let stock = getResult.data;
 
@@ -158,7 +158,7 @@ export class StockService {
             return new UpdateResponse(
                 `Could not find Stock [${id}].`,
                 getResult,
-                HttpCodes.HTTP_STATUS_FOUND
+                HttpCodes.HTTP_STATUS_FOUND,
             );
         }
 
@@ -174,7 +174,7 @@ export class StockService {
                     && stockPrice !== stock.price
                 ) {
                     await transactionalEntityManager.save(
-                        new StockHistory(stock, stockPrice, lastUpdated)
+                        new StockHistory(stock, stockPrice, lastUpdated),
                     );
                 }
 
@@ -185,14 +185,14 @@ export class StockService {
                 return new UpdateResponse(
                     `Stock ${stock.abbreviation} already exists. Stock [${id}] wasn't updated.`,
                     null,
-                    HttpCodes.HTTP_STATUS_FOUND
+                    HttpCodes.HTTP_STATUS_FOUND,
                 );
             }
 
             return new UpdateResponse(
                 `Unknown error whilst saving Stock ${stock.abbreviation} [${stock.id}].`,
                 null,
-                HttpCodes.HTTP_STATUS_FOUND
+                HttpCodes.HTTP_STATUS_FOUND,
             );
         }
 
@@ -200,7 +200,7 @@ export class StockService {
             return new UpdateResponse(
                 `Stock ${stock.abbreviation} [${id}] was not updated.`,
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
@@ -210,7 +210,7 @@ export class StockService {
         return new UpdateResponse(
             `Stock ${stock.abbreviation} [${stock.id}] updated.`,
             stock,
-            HttpCodes.HTTP_STATUS_BAD_REQUEST
+            HttpCodes.HTTP_STATUS_BAD_REQUEST,
         );
     }
 

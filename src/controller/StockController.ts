@@ -1,5 +1,7 @@
 import { json, Request, Response } from 'express';
-import { Controller, Delete, Get, Post, Put, Req, Res, UseBefore } from 'routing-controllers';
+import {
+    Controller, Delete, Get, Post, Put, Req, Res, UseBefore,
+} from 'routing-controllers';
 import { constants as HttpCodes } from 'http2';
 import { StockService } from '../service/StockService';
 import { StockGetResponse } from '../dto/response/stock/StockGetResponse';
@@ -11,6 +13,7 @@ import { StockFormatter } from '../formatter/StockFormatter';
 @UseBefore(json())
 class StockController {
     private stockService: StockService;
+
     private playerService: PlayerService;
 
     constructor() {
@@ -31,7 +34,7 @@ class StockController {
             return new StockGetResponse(
                 'Couldn\'t find the ID in the request.',
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
@@ -40,13 +43,13 @@ class StockController {
 
     @Get('/abbreviation/:abbreviation')
     async getByAbbreviation(@Req() request: Request, @Res() response: Response) {
-        const abbreviation = request.params.abbreviation;
+        const { abbreviation } = request.params;
 
         if (abbreviation === undefined) {
             return new StockGetResponse(
                 'Couldn\'t find the abbreviation in the request.',
                 null,
-                HttpCodes.HTTP_STATUS_BAD_REQUEST
+                HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
 
@@ -67,8 +70,8 @@ class StockController {
             new StockDTO(
                 data.abbreviation,
                 data.player,
-                data.price ?? null
-            )
+                data.price ?? null,
+            ),
         );
     }
 
@@ -83,7 +86,7 @@ class StockController {
             && id === undefined
         ) {
             return response.send({
-                message: `No content sent.`,
+                message: 'No content sent.',
                 data: null,
             });
         }
@@ -97,8 +100,8 @@ class StockController {
             new StockDTO(
                 data.abbreviation,
                 player,
-                data.price
-            )
+                data.price,
+            ),
         );
     }
 

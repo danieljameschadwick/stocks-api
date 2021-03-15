@@ -1,5 +1,7 @@
 import { json, Request, Response } from 'express';
-import { Controller, Delete, Get, Post, Put, Req, Res, UseBefore } from 'routing-controllers';
+import {
+    Controller, Delete, Get, Post, Put, Req, Res, UseBefore,
+} from 'routing-controllers';
 import UserService from '../service/UserService';
 
 @Controller('/user')
@@ -25,7 +27,7 @@ class UserController {
 
     @Get('/username/:username')
     async getByUsername(@Req() request: Request, @Res() response: Response) {
-        const username = request.params.username;
+        const { username } = request.params;
 
         return await this.userService.getByUsername(username);
     }
