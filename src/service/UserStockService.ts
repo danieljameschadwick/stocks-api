@@ -35,6 +35,7 @@ class UserStockService {
             .select([
                 'userStock',
                 'stock',
+                // 'user',
             ])
             .innerJoin('userStock.stock', 'stock')
             .innerJoin('userStock.user', 'user')
@@ -246,8 +247,8 @@ class UserStockService {
             await getManager().transaction(async transactionalEntityManager => {
                 await this.userStockRepository.update(id, userStock);
 
-                userBalance.balance = userBalance.balance + userStock.value();
-                await this.userRepository.update(userBalance.id, userBalance);
+                const balance = userBalance.balance + userStock.value();
+                await this.userRepository.update(userBalance.id, { balance });
             });
         } catch (error) {
             console.log(error);

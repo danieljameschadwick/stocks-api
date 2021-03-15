@@ -19,10 +19,9 @@ export class UserStock extends BaseEntity {
     @Field(type => User)
     @ManyToOne(() => User, user => user.stocks, {
         cascade: false,
-        nullable: false,
+        // nullable: false,
     })
     @JoinColumn({ name: 'intUserId' })
-
     user: User;
 
     @Field(type => Stock)
@@ -30,7 +29,7 @@ export class UserStock extends BaseEntity {
         cascade: false,
         nullable: false
     })
-    @JoinColumn({ name: 'intStockId', })
+    @JoinColumn({ name: 'intStockId' })
     stock: Stock;
 
     @Field()
@@ -62,7 +61,7 @@ export class UserStock extends BaseEntity {
     filledPrice?: number;
 
     @Field()
-    @Column({ name: 'dtmCreated' })
+    @Column({ name: 'dtmCreated', nullable: false })
     dateTime: Date;
 
     constructor(user: User, stock: Stock, price: number, quantity: number, dateTime?: Date) {
