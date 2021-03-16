@@ -10,7 +10,7 @@ import { Stock } from './Stock';
 import { User } from './User';
 
 const DEFAULT = {
-    MINIMUM_VALUE: 0.25,
+    MINIMUM_VALUE: 0.01,
 };
 
 @ObjectType()
