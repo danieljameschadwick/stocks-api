@@ -5,8 +5,13 @@ import {
     BaseEntity, JoinColumn, ManyToOne,
 } from 'typeorm';
 import { Field, ID, ObjectType } from 'type-graphql';
+import { Min } from 'class-validator';
 import { Stock } from './Stock';
 import { User } from './User';
+
+const DEFAULT = {
+    MINIMUM_VALUE: 0.25,
+};
 
 @ObjectType()
 @Entity('tblUserStock')
@@ -38,6 +43,7 @@ export class UserStock extends BaseEntity {
         precision: 10,
         scale: 2,
     })
+    @Min(DEFAULT.MINIMUM_VALUE)
     quantity: number;
 
     @Field()

@@ -35,7 +35,8 @@ class UserStockController {
     @Post('/buy')
     async buy(@Req() request: Request, @Res() response: Response) {
         const username = request.params.username.toString();
-        const { stock, quantity } = request.body;
+        const { stock } = request.body;
+        const quantity = Number(request.body.quantity);
 
         const userStock = new UserStockDTO(
             username,

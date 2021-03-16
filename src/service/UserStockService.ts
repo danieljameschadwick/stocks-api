@@ -1,4 +1,5 @@
 import { getManager, Repository } from 'typeorm';
+import { validate } from 'class-validator';
 import { constants as HttpCodes } from 'http2';
 import { formatStockName } from 'stocks-core/dist/lib/stock';
 import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethodResponse';
@@ -140,7 +141,7 @@ class UserStockService {
             );
         }
 
-        if (stock.price === null) {
+        if (stock.getPrice() === null) {
             return new BuyResponse(
                 `No price set on Stock [${abbreviation}].`,
                 null,
@@ -149,9 +150,9 @@ class UserStockService {
         }
 
         const { userBalance } = user;
-        const orderTotal = stock.price * quantity;
+        const orderTotal = stock.getPrice() * quantity;
 
-        if (userBalance.balance < orderTotal) {
+        if (userBalance.getBalance() < orderTotal) {
             return new BuyResponse(
                 `User ${user.username} [${user.id}] doesn't have enough funds.`,
                 null,
@@ -170,15 +171,24 @@ class UserStockService {
                     quantity,
                 );
 
+                const errors = await validate(userStock);
+                if (errors.length > 0) {
+                    throw new Error('Validation failed.'); // @TODO: elaborate errors
+                }
+
                 userStock = await transactionalEntityManager.save(userStock);
 
-                userBalance.balance -= orderTotal;
-                await transactionalEntityManager.update(UserBalance, userBalance.id, userBalance);
+                const balance = userBalance.getBalance() - orderTotal;
+                await transactionalEntityManager.update(
+                    UserBalance,
+                    userBalance.id,
+                    { balance },
+                );
             });
         } catch (error) {
             return new BuyResponse(
                 `Unknown error whilst saving UserStock ${abbreviation} [${quantity}] for ${username}.`,
-                null,
+                error.message ?? null,
                 HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }

@@ -72,6 +72,12 @@ export class Stock extends BaseEntity {
         this.flagUpdated();
     }
 
+    getPrice(): number|null {
+        return this.price === null
+            ? this.price
+            : Number(this.price);
+    }
+
     flagUpdated(date?: Date) {
         this.updatedDate = date ?? new Date();
     }
