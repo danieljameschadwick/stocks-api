@@ -155,7 +155,7 @@ class UserStockService {
         if (userBalance.getBalance() < orderTotal) {
             return new BuyResponse(
                 `User ${user.username} [${user.id}] doesn't have enough funds.`,
-                null,
+                `Balance ${userBalance.getBalance()} < ${orderTotal} | Total`,
                 HttpCodes.HTTP_STATUS_BAD_REQUEST,
             );
         }
