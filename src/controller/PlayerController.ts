@@ -10,7 +10,6 @@ import { TeamService } from '../service/TeamService';
 import { PlayerGetResponse } from '../dto/response/player/PlayerGetResponse';
 import { StockService } from '../service/StockService';
 import { TYPES } from '../di/Types';
-import { container } from "../di/Container";
 
 @Controller('/player')
 @UseBefore(json())
@@ -21,10 +20,14 @@ class PlayerController {
 
     private stockService: StockService;
 
-    constructor() {
-        this.playerService = container.get<PlayerService>(TYPES.PlayerService);
-        this.teamService = container.get<TeamService>(TYPES.TeamService);
-        this.stockService = container.get<StockService>(TYPES.StockService);
+    constructor(
+        @inject(TYPES.PlayerService) playerService: PlayerService,
+        @inject(TYPES.TeamService) teamService: TeamService,
+        @inject(TYPES.StockService) stockService: StockService,
+    ) {
+        this.playerService = playerService;
+        this.teamService = teamService;
+        this.stockService = stockService;
     }
 
     @Get('/')

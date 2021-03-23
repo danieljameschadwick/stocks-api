@@ -4,5 +4,4 @@ export const TYPES = {
     TeamService: Symbol.for('TeamService'),
     UserService: Symbol.for('UserService'),
     UserStockService: Symbol.for('UserStockService'),
-    TeamRepository: Symbol.for('TeamRepository'),
 };

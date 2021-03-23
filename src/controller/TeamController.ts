@@ -2,23 +2,23 @@ import { json, Request, Response } from 'express';
 import {
     Controller, Delete, Get, Post, Put, Req, Res, UseBefore,
 } from 'routing-controllers';
-import { injectable } from 'inversify';
+import { inject } from 'inversify';
 import { constants as HttpCodes } from 'http2';
 import { TeamService } from '../service/TeamService';
 import { TeamGetResponse } from '../dto/response/team/TeamGetResponse';
 import { TeamDTO } from '../dto/TeamDTO';
 import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethodResponse';
 import { TYPES } from '../di/Types';
-import { container } from '../di/Container';
 
 @Controller('/team')
 @UseBefore(json())
-@injectable()
 class TeamController {
     private teamService: TeamService;
 
-    constructor() {
-        this.teamService = container.get<TeamService>(TYPES.TeamService);
+    constructor(
+        @inject(TYPES.TeamService) teamService: TeamService,
+    ) {
+        this.teamService = teamService;
     }
 
     @Get('/')

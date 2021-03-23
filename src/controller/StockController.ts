@@ -2,15 +2,14 @@ import { json, Request, Response } from 'express';
 import {
     Controller, Delete, Get, Post, Put, Req, Res, UseBefore,
 } from 'routing-controllers';
-import { inject } from 'inversify';
 import { constants as HttpCodes } from 'http2';
+import { inject } from 'inversify';
 import { StockService } from '../service/StockService';
 import { StockGetResponse } from '../dto/response/stock/StockGetResponse';
 import { StockDTO } from '../dto/StockDTO';
 import { PlayerService } from '../service/PlayerService';
 import { StockFormatter } from '../formatter/StockFormatter';
 import { TYPES } from '../di/Types';
-import { container } from "../di/Container";
 
 @Controller('/stock')
 @UseBefore(json())
@@ -19,9 +18,12 @@ class StockController {
 
     private playerService: PlayerService;
 
-    constructor() {
-        this.stockService = container.get<StockService>(TYPES.StockService);
-        this.playerService = container.get<PlayerService>(TYPES.PlayerService);
+    constructor(
+        @inject(TYPES.StockService) stockService: StockService,
+        @inject(TYPES.PlayerService) playerService: PlayerService,
+    ) {
+        this.stockService = stockService;
+        this.playerService = playerService;
     }
 
     @Get('/')
