@@ -31,7 +31,7 @@
 		"passport-local": "^1.0.0",
 		"pg": "^8.5.1",
 		"reflect-metadata": "^0.1.13",
-		"routing-controllers": "^0.9.0-alpha.6",
+		"routing-controllers": "^0.9.0",
 		"stocks-core": "github:danis2gd/stocks-core#master",
 		"type-graphql": "^1.1.1",
 		"typeorm": "^0.2.29"

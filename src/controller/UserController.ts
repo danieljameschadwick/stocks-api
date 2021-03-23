@@ -1,8 +1,8 @@
 import { json, Request, Response } from 'express';
-import { inject } from 'inversify';
 import {
     Controller, Delete, Get, Post, Put, Req, Res, UseBefore,
 } from 'routing-controllers';
+import { container } from '../di/Container';
 import { TYPES } from '../di/Types';
 import { UserService } from '../service/UserService';
 
@@ -11,10 +11,8 @@ import { UserService } from '../service/UserService';
 class UserController {
     private userService: UserService;
 
-    constructor(
-        @inject(TYPES.UserService) userService: UserService,
-    ) {
-        this.userService = userService;
+    constructor() {
+        this.userService = container.get<UserService>(TYPES.UserService);
     }
 
     @Get('/')

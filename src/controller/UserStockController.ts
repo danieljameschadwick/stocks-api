@@ -2,20 +2,18 @@ import { json, Request, Response } from 'express';
 import {
     Controller, Delete, Get, Post, Req, Res, UseBefore,
 } from 'routing-controllers';
-import { inject } from 'inversify';
 import UserStockService from '../service/UserStockService';
 import { UserStockDTO } from '../dto/UserStockDTO';
 import { TYPES } from '../di/Types';
+import { container } from '../di/Container';
 
 @Controller('/user/:username/stock')
 @UseBefore(json())
 class UserStockController {
     private userStockService: UserStockService;
 
-    constructor(
-        @inject(TYPES.UserStockService) userStockService: UserStockService,
-    ) {
-        this.userStockService = userStockService;
+    constructor() {
+        this.userStockService = container.get<UserStockService>(TYPES.UserStockService);
     }
 
     @Get('/:abbreviation?')
