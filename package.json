@@ -23,6 +23,7 @@
 		"cors": "^2.8.5",
 		"express": "^4.17.1",
 		"glob": "^7.1.6",
+		"inversify": "^5.0.5",
 		"jsonwebtoken": "^8.5.1",
 		"npm-run-all": "^4.1.5",
 		"passport": "^0.4.1",

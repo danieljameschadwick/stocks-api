@@ -1,9 +1,9 @@
-import { getManager, Repository } from 'typeorm';
+import { getManager } from 'typeorm';
 import { validate } from 'class-validator';
 import { constants as HttpCodes } from 'http2';
+import { inject, injectable } from 'inversify';
 import { formatStockName } from 'stocks-core/dist/lib/stock';
 import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethodResponse';
-import { Stock } from '../entity/Stock';
 import { UserStockBuyResponse as BuyResponse } from '../dto/response/userStock/UserStockBuyResponse';
 import { UserStockSellResponse as SellResponse } from '../dto/response/userStock/UserStockSellResponse';
 import { UserStockGetResponse as GetResponse } from '../dto/response/userStock/UserStockGetResponse';
@@ -13,24 +13,27 @@ import { UserStockDTO } from '../dto/UserStockDTO';
 import { UserBalance } from '../entity/UserBalance';
 import { UserRepository } from '../repository/UserRepository';
 import { UserService } from './UserService';
+import { StockRepository } from '../repository/StockRepository';
+import { UserStockRepository } from '../repository/UserStockRepository';
+import { TYPES } from '../di/Types';
 
+@injectable()
 class UserStockService {
-    private userStockRepository: Repository<UserStock>;
+    private userStockRepository: UserStockRepository;
 
-    private stockRepository: Repository<Stock>;
+    private stockRepository: StockRepository;
 
     private userRepository: UserRepository;
 
-    private userBalanceRepository: Repository<UserBalance>;
-
     private userService: UserService;
 
-    constructor() {
-        this.userStockRepository = getManager().getRepository(UserStock);
-        this.stockRepository = getManager().getRepository(Stock);
+    constructor(
+        @inject(TYPES.UserService) userService: UserService,
+    ) {
+        this.userStockRepository = getManager().getCustomRepository(UserStockRepository);
+        this.stockRepository = getManager().getCustomRepository(StockRepository);
         this.userRepository = getManager().getCustomRepository(UserRepository);
-        this.userBalanceRepository = getManager().getRepository(UserBalance);
-        this.userService = new UserService();
+        this.userService = userService;
     }
 
     async get(id: number): Promise<GetResponse> {

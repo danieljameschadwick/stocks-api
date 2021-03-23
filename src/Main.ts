@@ -15,6 +15,8 @@ import PlayerController from './controller/PlayerController';
 import TeamController from './controller/TeamController';
 import StockController from './controller/StockController';
 import UserStockController from './controller/UserStockController';
+import { container } from "./di/Container";
+import { TYPES } from "./di/Types";
 
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
@@ -79,7 +81,7 @@ createConnection().then(async () => {
 
     passport.use(new LocalStrategy(
         async (username, password, done) => {
-            const userService = new UserService();
+            const userService = container.get<UserService>(TYPES.UserService);
 
             const userResponse = await userService.getByUsername(username);
             const user = userResponse.data;

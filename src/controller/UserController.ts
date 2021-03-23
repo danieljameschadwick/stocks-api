@@ -1,7 +1,9 @@
 import { json, Request, Response } from 'express';
+import { inject } from 'inversify';
 import {
     Controller, Delete, Get, Post, Put, Req, Res, UseBefore,
 } from 'routing-controllers';
+import { TYPES } from '../di/Types';
 import { UserService } from '../service/UserService';
 
 @Controller('/user')
@@ -9,8 +11,10 @@ import { UserService } from '../service/UserService';
 class UserController {
     private userService: UserService;
 
-    constructor() {
-        this.userService = new UserService();
+    constructor(
+        @inject(TYPES.UserService) userService: UserService,
+    ) {
+        this.userService = userService;
     }
 
     @Get('/')

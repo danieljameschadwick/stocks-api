@@ -1,11 +1,13 @@
 {
 	"version": "2.4.2",
 	"compilerOptions": {
+		"target": "es5",
 		"lib": [
-			"es5",
 			"es6"
 		],
-		"target": "es6",
+		"types": [
+			"reflect-metadata"
+		],
 		"module": "commonjs",
 		"moduleResolution": "node",
 		"esModuleInterop": true,

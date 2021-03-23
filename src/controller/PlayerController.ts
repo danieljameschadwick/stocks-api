@@ -2,12 +2,15 @@ import { json, Request, Response } from 'express';
 import {
     Controller, Delete, Get, Post, Put, Req, Res, UseBefore,
 } from 'routing-controllers';
+import { inject } from 'inversify';
 import { constants as HttpCodes } from 'http2';
 import { PlayerService } from '../service/PlayerService';
 import { PlayerDTO } from '../dto/PlayerDTO';
 import { TeamService } from '../service/TeamService';
 import { PlayerGetResponse } from '../dto/response/player/PlayerGetResponse';
 import { StockService } from '../service/StockService';
+import { TYPES } from '../di/Types';
+import { container } from "../di/Container";
 
 @Controller('/player')
 @UseBefore(json())
@@ -19,9 +22,9 @@ class PlayerController {
     private stockService: StockService;
 
     constructor() {
-        this.playerService = new PlayerService();
-        this.teamService = new TeamService();
-        this.stockService = new StockService();
+        this.playerService = container.get<PlayerService>(TYPES.PlayerService);
+        this.teamService = container.get<TeamService>(TYPES.TeamService);
+        this.stockService = container.get<StockService>(TYPES.StockService);
     }
 
     @Get('/')

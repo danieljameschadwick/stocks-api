@@ -1,5 +1,6 @@
 import { getManager, Repository } from 'typeorm';
 import { constants as HttpCodes } from 'http2';
+import { injectable } from 'inversify';
 import { Team } from '../entity/Team';
 import { TeamGetResponse as GetResponse } from '../dto/response/team/TeamGetResponse';
 import { ORM } from '../enum/Error';
@@ -8,12 +9,14 @@ import { TeamGetAllResponse as GetAllResponse } from '../dto/response/team/TeamG
 import { TeamCreateResponse as CreateResponse } from '../dto/response/team/TeamCreateResponse';
 import { TeamUpdateResponse as UpdateResponse } from '../dto/response/team/TeamUpdateResponse';
 import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethodResponse';
+import { TeamRepository } from '../repository/TeamRepository';
 
+@injectable()
 export class TeamService {
-    private teamRepository: Repository<Team>;
+    private teamRepository: TeamRepository;
 
     constructor() {
-        this.teamRepository = getManager().getRepository(Team);
+        this.teamRepository = getManager().getCustomRepository(TeamRepository);
     }
 
     async getAll(): Promise<GetAllResponse> {

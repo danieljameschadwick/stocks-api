@@ -1,23 +1,22 @@
 import { getManager, In, Repository } from 'typeorm';
 import { constants as HttpCodes } from 'http2';
+import { injectable } from 'inversify';
 import { Player } from '../entity/Player';
 import { PlayerDTO } from '../dto/PlayerDTO';
 import { ORM } from '../enum/Error';
-import { Team } from '../entity/Team';
 import { PlayerGetResponse as GetResponse } from '../dto/response/player/PlayerGetResponse';
 import { PlayerCreateResponse as CreateResponse } from '../dto/response/player/PlayerCreateResponse';
 import { PlayerUpdateResponse as UpdateResponse } from '../dto/response/player/PlayerUpdateResponse';
 import { PlayerGetAllResponse } from '../dto/response/player/PlayerGetAllResponse';
 import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethodResponse';
+import { PlayerRepository } from '../repository/PlayerRepository';
 
+@injectable()
 export class PlayerService {
-    private playerRepository: Repository<Player>;
-
-    private teamRepository: Repository<Team>;
+    private playerRepository: PlayerRepository;
 
     constructor() {
-        this.playerRepository = getManager().getRepository(Player);
-        this.teamRepository = getManager().getRepository(Team);
+        this.playerRepository = getManager().getCustomRepository(PlayerRepository);
     }
 
     async getAll(ids?: number[]): Promise<PlayerGetAllResponse> {

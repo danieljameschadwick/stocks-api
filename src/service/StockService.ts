@@ -1,5 +1,6 @@
 import { getConnection, getManager, Repository } from 'typeorm';
 import { constants as HttpCodes } from 'http2';
+import { injectable } from 'inversify';
 import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethodResponse';
 import { Stock } from '../entity/Stock';
 import { StockGetAllResponse as GetAllResponse } from '../dto/response/stock/StockGetAllResponse';
@@ -9,12 +10,14 @@ import { StockUpdateResponse as UpdateResponse } from '../dto/response/stock/Sto
 import { StockDTO } from '../dto/StockDTO';
 import { ORM } from '../enum/Error';
 import { StockHistory } from '../entity/StockHistory';
+import { StockRepository } from '../repository/StockRepository';
 
+@injectable()
 export class StockService {
-    private stockRepository: Repository<Stock>;
+    private stockRepository: StockRepository;
 
     constructor() {
-        this.stockRepository = getManager().getRepository(Stock);
+        this.stockRepository = getManager().getCustomRepository(StockRepository);
     }
 
     async getAll(): Promise<GetAllResponse> {

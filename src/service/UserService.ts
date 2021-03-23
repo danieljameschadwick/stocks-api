@@ -1,9 +1,11 @@
 import { getManager } from 'typeorm';
 import { constants as HttpCodes } from 'http2';
+import { injectable } from 'inversify';
 import { UnimplementedMethodResponse } from '../dto/response/UnimplementedMethodResponse';
 import { UserGetResponse as GetResponse } from '../dto/response/user/UserGetResponse';
 import { UserRepository } from '../repository/UserRepository';
 
+@injectable()
 export class UserService {
     private userRepository: UserRepository;
 
